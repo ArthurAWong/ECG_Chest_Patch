@@ -11,7 +11,6 @@
 #include <zephyr/zephyr.h>
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/spi.h>
 
 #define STACK_SIZE 512
 #define BUF_SIZE 17
@@ -39,8 +38,19 @@ struct spi_config spi_cfg_slow = {
 	.cs = (&spi_cs),
 };
 
-struct spi_buf tx_bufs[1];
-struct spi_buf rx_bufs[1];
+struct spi_buf tx_bufs[1] = {
+	{
+		.buf = buffer_tx,
+		.len = BUF_SIZE
+	}
+};
+struct spi_buf rx_bufs[1] = 
+{
+	{
+		.buf = buffer_rx,
+		.len = BUF_SIZE
+	}
+};
 
 const struct spi_buf_set tx = {
 	.buffers = tx_bufs,
@@ -84,9 +94,9 @@ void main(void)
 		printk("Buffer contents are different: %s\n", buffer_print_tx);
 		printk("                           vs: %s\n", buffer_print_rx);
 		printk("Buffer contents are different\n");
+		goto end;
 	}
 
 	printk("spi_complete_loop Passed\n");
-
-	printk("Hello World! %s\n", CONFIG_BOARD);
+	end:;
 }

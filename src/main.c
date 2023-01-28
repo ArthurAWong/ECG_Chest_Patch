@@ -80,6 +80,7 @@ void main(void)
 		printk("Invalid SPI device");
 		return;
 	}
+
 	printk("SPI test slow config\n");
 	ret = spi_transceive(spi_slow, &spi_cfg_slow, &tx, &rx);
 	if (ret) {

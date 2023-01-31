@@ -12,11 +12,10 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/gpio.h>
 
-#define STACK_SIZE 512
-#define BUF_SIZE 17
+#define BUF_SIZE 2
 
-uint8_t buffer_tx[] = "0123456789abcdef\0";
-uint8_t buffer_rx[BUF_SIZE] = {};
+uint8_t buffer_tx[BUF_SIZE] = {0x8f, 0x00};
+uint8_t buffer_rx[BUF_SIZE] = {0x00, 0x00};
 
 uint8_t buffer_print_tx[BUF_SIZE * 5 + 1];
 uint8_t buffer_print_rx[BUF_SIZE * 5 + 1];
@@ -31,9 +30,9 @@ struct spi_cs_control spi_cs = {
 };
 
 struct spi_config spi_cfg_slow = {
-	.frequency = 500000,
+	.frequency = 300000,
 	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
-	SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
+	SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE | SPI_CONFIG_ORDER_MsbFirst,
 	.slave = 0,
 	.cs = (&spi_cs),
 };
@@ -81,23 +80,28 @@ void main(void)
 		return;
 	}
 
-	printk("SPI test slow config\n");
+	to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
+	printk("Delay for 1 second\n");
+	k_msleep(1000);
+	printk("Sending:  %s\n", buffer_print_tx);
 	ret = spi_transceive(spi_slow, &spi_cfg_slow, &tx, &rx);
+	
 	if (ret) {
 		printk("Code %d\n", ret);
 		printk("SPI transceive failed\n");
 		return;
 	}
 
-	if (memcmp(buffer_tx, buffer_rx, BUF_SIZE)) {
-		to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
-		to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
-		printk("Buffer contents are different: %s\n", buffer_print_tx);
-		printk("                           vs: %s\n", buffer_print_rx);
-		printk("Buffer contents are different\n");
-		goto end;
-	}
+	to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
+	printk("Recieved: %s\n",buffer_print_rx);
 
-	printk("spi_complete_loop Passed\n");
-	end:;
+	// if (memcmp(buffer_tx, buffer_rx, BUF_SIZE)) {
+	// 	printk("Buffer contents are different: %s\n", buffer_print_tx);
+	// 	printk("                           vs: %s\n", buffer_print_rx);
+	// 	printk("Buffer contents are different\n");
+	// 	goto end;
+	// }
+
+	// printk("spi_complete_loop Passed\n");
+	// end:;
 }

@@ -103,7 +103,7 @@ union Status_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_Status
     {
         uint32_t loff_nl : 1;
         uint32_t loff_nh : 1;
@@ -130,7 +130,7 @@ union EnableInterrupts_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_InteruptEn
     {
         uint32_t intb_type : 2;
         uint32_t reserved1 : 6;
@@ -154,7 +154,7 @@ union ManageInterrupts_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_Interrupt
     {
         uint32_t samp_it : 4;
         uint32_t clr_samp : 1;
@@ -174,7 +174,7 @@ union ManageDynamicModes_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_DynamicMode
     {
         uint32_t reserved1 : 16;
         uint32_t fast_th : 6;
@@ -190,7 +190,7 @@ union GeneralConfiguration_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_GeneralConfig
     {
         uint32_t rbiasn : 1;
         uint32_t rbiasp : 1;
@@ -215,7 +215,7 @@ union CalConfiguration_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_CalConfig
     {
         uint32_t thigh : 11;
         uint32_t fifty : 1;
@@ -236,7 +236,7 @@ union MuxConfiguration_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_MuxConfig
     {
         uint32_t reserved1 : 16;
         uint32_t caln_sel : 2;
@@ -256,7 +256,7 @@ union ECGConfiguration_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_ECGConfig
     {
         uint32_t reserved1 : 12;
         uint32_t dlpf : 2;
@@ -276,7 +276,7 @@ union RtoR1Configuration_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_RtoR1
     {
         uint32_t reserved1 : 8;
         uint32_t ptsf : 4;
@@ -296,7 +296,7 @@ union RtoR2Configuration_u
     uint32_t all;
 
     /// Access individual bits
-    struct BitField_s
+    struct BitField_RtoR2
     {
         uint32_t reserved1 : 8;
         uint32_t rhsf : 3;

@@ -12,6 +12,8 @@
 #include <zephyr/drivers/spi.h>
 #include <zephyr/drivers/gpio.h>
 
+#include "lsm6dsm.h"
+
 #define BUF_SIZE 2
 
 uint8_t buffer_tx[BUF_SIZE] = {0x8f, 0x00};

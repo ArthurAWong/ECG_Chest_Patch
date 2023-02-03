@@ -38,6 +38,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <zephyr/zephyr.h>
+
+#include "spi_config.h"
+
+#define BUF_SIZE 4
+
 /**
  * @brief Library for MAX30003\n
  * The MAX30003 is a complete, biopotential, analog frontend solution for
@@ -308,5 +313,6 @@ union RtoR2Configuration_u
     } bits;
 };
 
+bool max_readinfo(void);
 
 #endif /* _MAX30003_H_ */

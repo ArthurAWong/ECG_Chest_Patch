@@ -11,8 +11,7 @@ void main(void)
 	lsm6dsm_write_buffer(0x04, 0x05);
 	uint8_t out_var = 0;
 
-	lsm6dsm_read_buffer(0x04, &out_var);
 	printk("%d\n", out_var);
-
-	printk("0x%02x\n", out_var);
+	int ret = lsm6dsm_read_buffer(0x04, &out_var);
+	printk("%d\n", out_var);
 }

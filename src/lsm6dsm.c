@@ -67,7 +67,7 @@ int lsm6dsm_read_buffer(uint8_t reg, uint8_t *out_data)
 {
     buffer_tx[0] = READ_BIT_SET(reg);
     int ret = spi_transceive(spi_device, &spi_cfg, &tx, &rx);
-    out_data[0] = buffer_rx[1];
+    *out_data = buffer_rx[1];
 
     return ret;
 }

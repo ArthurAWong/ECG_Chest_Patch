@@ -1,3 +1,11 @@
+#include <stdio.h>
+#include <zephyr/zephyr.h>
+
+#ifndef LSM6DSM
+#define LSM6DSM
+
+#define BUF_SIZE 2
+
 /*********** REGISTERS ***********/
 
 /* Setup registers */
@@ -176,4 +184,8 @@
 
 /*********** FUNCTIONS ***********/
 
-void lsm6dsm_setup();
+void lsm6dsm_test();
+int lsm6dsm_write_buffer(uint8_t reg, uint8_t data);
+int lsm6dsm_read_buffer(uint8_t reg, uint8_t *out_data);
+
+#endif // LSM6DSM

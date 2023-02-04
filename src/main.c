@@ -4,106 +4,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <zephyr/kernel.h>
-#include <zephyr/sys/printk.h>
-#include <string.h>
-#include <stdio.h>
-#include <zephyr/zephyr.h>
-#include <zephyr/drivers/spi.h>
-#include <zephyr/drivers/gpio.h>
-
 #include "lsm6dsm.h"
-
-#define BUF_SIZE 2
-
-uint8_t buffer_tx[BUF_SIZE] = {0x8f, 0x00};
-uint8_t buffer_rx[BUF_SIZE] = {0x00, 0x00};
-
-uint8_t buffer_print_tx[BUF_SIZE * 5 + 1];
-uint8_t buffer_print_rx[BUF_SIZE * 5 + 1];
-
-struct spi_cs_control spi_cs = {
-	.gpio = {
-		.port = DEVICE_DT_GET(DT_NODELABEL(gpio0)),
-		.pin = 28,
-		.dt_flags = GPIO_ACTIVE_LOW
-	},
-	.delay = 0,
-};
-
-struct spi_config spi_cfg_slow = {
-	.frequency = 8000000,
-	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL |
-	SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE | SPI_CONFIG_ORDER_MsbFirst,
-	.slave = 0,
-	.cs = (&spi_cs),
-};
-
-struct spi_buf tx_bufs[1] = {
-	{
-		.buf = buffer_tx,
-		.len = BUF_SIZE
-	}
-};
-struct spi_buf rx_bufs[1] = 
-{
-	{
-		.buf = buffer_rx,
-		.len = BUF_SIZE
-	}
-};
-
-const struct spi_buf_set tx = {
-	.buffers = tx_bufs,
-	.count = ARRAY_SIZE(tx_bufs)
-};
-const struct spi_buf_set rx = {
-	.buffers = rx_bufs,
-	.count = ARRAY_SIZE(rx_bufs)
-};
-
-static void to_display_format(const uint8_t *src, size_t size, char *dst)
-{
-	size_t i;
-
-	for (i = 0; i < size; i++) {
-		sprintf(dst + 5 * i, "0x%02x,", src[i]);
-	}
-}
 
 void main(void)
 {
-	int ret;
-	const struct device *spi_slow;
-	spi_slow = DEVICE_DT_GET(DT_NODELABEL(spi1));
-	if (!spi_slow) {
-		printk("Cannot find SPI_1\n");
-		printk("Invalid SPI device");
-		return;
-	}
+	lsm6dsm_write_buffer(0x04, 0x05);
+	uint8_t out_var = 0;
 
-	to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
-	printk("Delay for 1 second\n");
-	k_msleep(1000);
-	printk("Sending:  %s\n", buffer_print_tx);
-	ret = spi_transceive(spi_slow, &spi_cfg_slow, &tx, &rx);
-	
-	if (ret) {
-		printk("Code %d\n", ret);
-		printk("SPI transceive failed\n");
-		return;
-	}
+	lsm6dsm_read_buffer(0x04, &out_var);
+	printk("%d\n", out_var);
 
-	to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
-	printk("Recieved: %s\n",buffer_print_rx);
-
-	// if (memcmp(buffer_tx, buffer_rx, BUF_SIZE)) {
-	// 	printk("Buffer contents are different: %s\n", buffer_print_tx);
-	// 	printk("                           vs: %s\n", buffer_print_rx);
-	// 	printk("Buffer contents are different\n");
-	// 	goto end;
-	// }
-
-	// printk("spi_complete_loop Passed\n");
-	// end:;
+	printk("0x%02x\n", out_var);
 }

@@ -41,7 +41,7 @@
 
 #include "spi_config.h"
 
-#define BUF_SIZE 4
+#define MAX_BUF_SIZE 4
 
 /**
  * @brief Library for MAX30003\n

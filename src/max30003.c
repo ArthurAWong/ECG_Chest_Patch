@@ -4,30 +4,22 @@
 
 #include "max30003.h"
 
-uint8_t buffer_tx[BUF_SIZE] = {0x1f, 0x00, 0x00, 0x00};
-uint8_t buffer_rx[BUF_SIZE] = {};
 
-uint8_t buffer_print_tx[BUF_SIZE * 5 + 1];
-uint8_t buffer_print_rx[BUF_SIZE * 5 + 1];
+#define WRITE_REG(reg) ((reg << 1) & ~(1 << 0))
+#define READ_REG(reg) ((reg << 1) | (1 << 0))
+
+uint8_t buffer_tx[MAX_BUF_SIZE] = {};
+uint8_t buffer_rx[MAX_BUF_SIZE] = {};
+
+uint8_t buffer_print_tx[MAX_BUF_SIZE * 5 + 1];
+uint8_t buffer_print_rx[MAX_BUF_SIZE * 5 + 1];
 
 /*Number inside the [] Tells us how many buffers*/
 /*.buf is the type of buffer*/
 /*.len is the length of the buffer*/
-struct spi_buf tx_bufs[1] =
-{
-    {
-        .buf = buffer_tx,
-        .len = BUF_SIZE
-    },
-};
+struct spi_buf tx_bufs[2] = {};
 
-struct spi_buf rx_bufs[1] =
-{
-    {
-        .buf = buffer_rx,
-        .len = BUF_SIZE
-    }
-};
+struct spi_buf rx_bufs[2] = {};
 
 const struct spi_buf_set tx = 
 {
@@ -41,18 +33,43 @@ const struct spi_buf_set rx =
 	.count = ARRAY_SIZE(rx_bufs)
 };
 
+int max30003_read(uint8_t reg, void *data, size_t size)
+{
+	uint8_t dummy;
+	tx_bufs[0].buf = &reg;
+	tx_bufs[0].len = 1;
+	tx_bufs[1].buf = NULL;
+	tx_bufs[1].len = 0;
+	rx_bufs[0].buf = &dummy;
+	rx_bufs[0].len = 1;
+	rx_bufs[1].buf = data;
+	rx_bufs[1].len = size;
+
+	int ret = spi_transceive(spi_device, &spi_cfg, &tx, &rx);
+	return ret;
+}
+
+int max3003_write(uint8_t reg, void *data, size_t size)
+{   
+	tx_bufs[0].buf = &reg;
+	tx_bufs[0].len = 1;
+	tx_bufs[1].buf = data;
+	tx_bufs[1].len = size;
+	int ret = spi_transceive(spi_device, &spi_cfg, &tx, NULL);
+	return ret;
+}
+
 bool max_readinfo()
 {
 	// printk("Shifting Registers!\n");
-	// *buffer_tx = {0x1f, 0x00, 0x00, 0x00}; // Shift and make the last bit 1 to indicate read mode in SPI
+	const uint8_t reg = 0x1f;
+	uint8_t data[3];
+	//memset(data, 0, sizeof data);
 
-	to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
-	printk("Sending:   %s\n", buffer_print_tx);
-
-	int ret = spi_transceive(spi_device, &spi_cfg, &tx, &rx);
-
-	to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
-	printk("Recieving: %s\n", buffer_print_rx);
+	//int ret = max30003_read(reg, data, sizeof data);
+	int ret = max30003_read(0x1f, data, sizeof data);
+	to_display_format(data, 3, buffer_print_rx);
+	printk("Receiving: %s\n", buffer_print_rx);
 	printk("spi_transcieve returns %d \n", ret);
 
 	// First check if the transieve was successful
@@ -62,11 +79,11 @@ bool max_readinfo()
 		return false;
 	}
 
-	if ((buffer_rx[1] & 0xF0) == 0x50)
+	if ((data[0] & 0xF0) == 0x50)
 	{
 		printk("MAX is ready!\n");
 		printk("Dev ID: ");
-		printk("%x", buffer_rx[1] & 0xFF);
+		printk("%x", data[0] & 0xFF);
 		return true;
 	}
 	else

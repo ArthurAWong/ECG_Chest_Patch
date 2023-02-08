@@ -7,7 +7,7 @@
 #include "max30003.h"
 
 void main(void)
-{
+{	
 	int ret;
 	ret = max_readinfo();
 

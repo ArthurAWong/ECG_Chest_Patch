@@ -21,7 +21,7 @@ struct spi_cs_control spi_cs =
 
 struct spi_config spi_cfg = 
 {
-	.frequency = 8000000,
+	.frequency = 125000,
 	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_CONFIG_ORDER_MsbFirst |
                 SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
 	.slave = 0,

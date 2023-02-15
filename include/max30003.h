@@ -315,4 +315,6 @@ union RtoR2Configuration_u
 
 bool max_readinfo(void);
 
+int max_enable_ecg(void);
+
 #endif /* _MAX30003_H_ */

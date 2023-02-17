@@ -8,8 +8,9 @@
 
 void main(void)
 {	
+	//setup_interrupt();
 	max_reset_sw();
 	max_readinfo();
 	max_readstatus();
-	// max_enable_ecg();
+	max_enable_ecg();
 }

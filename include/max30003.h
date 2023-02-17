@@ -101,220 +101,92 @@ enum Registers_e
     NO_OP2 = 0x7F
 };
 
-/// Status register bits
-union Status_u
-{
-    /// Access all bits
-    uint32_t all;
+#define STATUS_LOFF_NL 0
+#define STATUS_LOFF_NH 1
+#define STATUS_LOFF_PL 2
+#define STATUS_LOFF_PH 3
+#define STATUS_PLLINT 8
+#define STATUS_SAMP 9
+#define STATUS_RRINT 10
+#define STATUS_LONINT 11
+#define STATUS_DCLOFFINT 20
+#define STATUS_FSTINT 21
+#define STATUS_EOVF 22
+#define STATUS_EINT 23
 
-    /// Access individual bits
-    struct BitField_Status
-    {
-        uint32_t loff_nl : 1;
-        uint32_t loff_nh : 1;
-        uint32_t loff_pl : 1;
-        uint32_t loff_ph : 1;
-        uint32_t reserved1 : 4;
-        uint32_t pllint : 1;
-        uint32_t samp : 1;
-        uint32_t rrint : 1;
-        uint32_t lonint : 1;
-        uint32_t reserved2 : 8;
-        uint32_t dcloffint : 1;
-        uint32_t fstint : 1;
-        uint32_t eovf : 1;
-        uint32_t eint : 1;
-        uint32_t reserved3 : 8;
-    } bits;
-};
+#define EN_INT_INTB_TYPE 0
+#define EN_INT_EN_PLLINT 8
+#define EN_INT_EN_SAMP 9
+#define EN_INT_EN_RRINT 10
+#define EN_INT_EN_LONINT 11
+#define EN_INT_EN_DCL_OFFINT 20
+#define EN_INT_EN_FSTINT 21
+#define EN_INT_EN_EOVF 22
+#define EN_INT_EN_EINT 23
 
-/// Enable Interrupt registers bits
-union EnableInterrupts_u
-{
-    /// Access all bits
-    uint32_t all;
+#define MNGR_INT_SAMP_IT 0
+#define MNGR_INT_CLR_SAMP 2
+#define MNGR_INT_CLR_RRINT 4
+#define MNGR_INT_CLR_FAST 6
+#define MNGR_INT_EFIT 19
 
-    /// Access individual bits
-    struct BitField_InteruptEn
-    {
-        uint32_t intb_type : 2;
-        uint32_t reserved1 : 6;
-        uint32_t en_pllint : 1;
-        uint32_t en_samp : 1;
-        uint32_t en_rrint : 1;
-        uint32_t en_loint : 1;
-        uint32_t reserved2 : 8;
-        uint32_t en_dcloffint : 1;
-        uint32_t en_fstint : 1;
-        uint32_t en_eovf : 1;
-        uint32_t en_eint : 1;
-        uint32_t reserved3 : 8;
-    } bits;
-};
+#define MNGR_DYN_FAST_TH 16
+#define MNGR_DYN_FAST 22
 
-/// Manage Interrupt register bits
-union ManageInterrupts_u
-{
-    /// Access all bits
-    uint32_t all;
+#define CNFG_GEN_RBIASN 0
+#define CNFG_GEN_RBIASP 1
+#define CNFG_GEN_RBIASV 2
+#define CNFG_GEN_EN_RBIAS 4
+#define CNFG_GEN_VTH 6
+#define CNFG_GEN_IMAG 8
+#define CNFG_GEN_IPOL 3
+#define CNFG_GEN_EN_DCLOFF 12
+#define CNFG_GEN_EN_ECG 19
+#define CNFG_GEN_FMSTR 20
+#define CNFG_GEN_EN_ULP_LON 22
 
-    /// Access individual bits
-    struct BitField_Interrupt
-    {
-        uint32_t samp_it : 4;
-        uint32_t clr_samp : 1;
-        uint32_t reserved1 : 1;
-        uint32_t clr_rrint : 2;
-        uint32_t clr_fast : 1;
-        uint32_t reserved2 : 12;
-        uint32_t efit : 5;
-        uint32_t reserved3 : 8;
-    } bits;
-};
+#define CNFG_CAL_THIGH 0
+#define CNFG_CAL_FIFTY 11
+#define CNFG_CAL_FCAL 12
+#define CNFG_CAL_VMAG 20
+#define CNFG_CAL_VMODE 21
+#define CNFG_CAL_EN_VCAL 22
 
-/// Manage Dynamic Modes register bits
-union ManageDynamicModes_u
-{
-    /// Access all bits
-    uint32_t all;
+#define CNFG_EMUX_CALN_SEL 16
+#define CNFG_EMUX_CALP_SEL 18
+#define CNFG_EMUX_OPENN 20
+#define CNFG_EMUX_OPENP 21
+#define CNFG_EMUX_POL 23
 
-    /// Access individual bits
-    struct BitField_DynamicMode
-    {
-        uint32_t reserved1 : 16;
-        uint32_t fast_th : 6;
-        uint32_t fast : 2;
-        uint32_t reserved2 : 8;
-    } bits;
-};
+#define CNFG_ECG_DLPF 12
+#define CNFG_ECG_DHPF 14
+#define CNFG_ECG_GAIN 16
+#define CNFG_ECG_RATE 22
 
-/// General Configuration bits
-union GeneralConfiguration_u
-{
-    /// Access all bits
-    uint32_t all;
+#define CNFG_RTOR1_PTSF 8
+#define CNFG_RTOR1_PAVG 12
+#define CNFG_RTOR1_EN_RTOR 15
+#define CNFG_RTOR1_GAIN 16
+#define CNFG_RTOR1_WNDW 20
 
-    /// Access individual bits
-    struct BitField_GeneralConfig
-    {
-        uint32_t rbiasn : 1;
-        uint32_t rbiasp : 1;
-        uint32_t rbiasv : 2;
-        uint32_t en_rbias : 2;
-        uint32_t vth : 2;
-        uint32_t imag : 3;
-        uint32_t ipol : 1;
-        uint32_t en_dcloff : 2;
-        uint32_t reserved1 : 5;
-        uint32_t en_ecg : 1;
-        uint32_t fmstr : 2;
-        uint32_t en_ulp_lon : 2;
-        uint32_t reserved2 : 8;
-    } bits;
-};
-
-/// Cal Configuration bits
-union CalConfiguration_u
-{
-    /// Access all bits
-    uint32_t all;
-
-    /// Access individual bits
-    struct BitField_CalConfig
-    {
-        uint32_t thigh : 11;
-        uint32_t fifty : 1;
-        uint32_t fcal : 3;
-        uint32_t reserved1 : 5;
-        uint32_t vmag : 1;
-        uint32_t vmode : 1;
-        uint32_t en_vcal : 1;
-        uint32_t reserved2 : 9;
-
-    } bits;
-};
-
-/// Mux Configuration bits
-union MuxConfiguration_u
-{
-    /// Access all bits
-    uint32_t all;
-
-    /// Access individual bits
-    struct BitField_MuxConfig
-    {
-        uint32_t reserved1 : 16;
-        uint32_t caln_sel : 2;
-        uint32_t calp_sel : 2;
-        uint32_t openn : 1;
-        uint32_t openp : 1;
-        uint32_t reserved2 : 1;
-        uint32_t pol : 1;
-        uint32_t reserved3 : 8;
-    } bits;
-};
-
-/// ECG Configuration bits
-union ECGConfiguration_u
-{
-    /// Access all bits
-    uint32_t all;
-
-    /// Access individual bits
-    struct BitField_ECGConfig
-    {
-        uint32_t reserved1 : 12;
-        uint32_t dlpf : 2;
-        uint32_t dhpf : 1;
-        uint32_t reserved2 : 1;
-        uint32_t gain : 2;
-        uint32_t reserved3 : 4;
-        uint32_t rate : 2;
-        uint32_t reserved4 : 8;
-    } bits;
-};
-
-/// RtoR1 Configuration bits
-union RtoR1Configuration_u
-{
-    /// Access all bits
-    uint32_t all;
-
-    /// Access individual bits
-    struct BitField_RtoR1
-    {
-        uint32_t reserved1 : 8;
-        uint32_t ptsf : 4;
-        uint32_t pavg : 2;
-        uint32_t reserved2 : 1;
-        uint32_t en_rtor : 1;
-        uint32_t rgain : 4;
-        uint32_t wndw : 4;
-        uint32_t reserved3 : 8;
-    } bits;
-};
-
-/// RtoR2 Configuration bits
-union RtoR2Configuration_u
-{
-    /// Access all bits
-    uint32_t all;
-
-    /// Access individual bits
-    struct BitField_RtoR2
-    {
-        uint32_t reserved1 : 8;
-        uint32_t rhsf : 3;
-        uint32_t reserved2 : 1;
-        uint32_t ravg : 2;
-        uint32_t reserved3 : 2;
-        uint32_t hoff : 6;
-        uint32_t reserved4 : 10;
-    } bits;
-};
+#define CNFG_RTOR2_RHSF 8
+#define CNFG_RTOR2_RAVG 12
+#define CNFG_RTOR2_HOFF 16
 
 bool max_readinfo(void);
 
+bool max_reset_sw(void);
+
 int max_enable_ecg(void);
+
+int max_readstatus(void);
+
+int setup_interrupt(void);
+
+int max30003_write(uint8_t reg, void *data, size_t size);
+
+int max30003_write_uint32(uint8_t reg, uint32_t data);
+
+int max30003_read(uint8_t reg, void *data, size_t size);
 
 #endif /* _MAX30003_H_ */

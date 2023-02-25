@@ -1,0 +1,70 @@
+{
+	"folders": [
+		{
+			"path": "../../ncs"
+		},
+		{
+			"name": "ECG_Chestpatch",
+			"path": "."
+		}
+	],
+	"settings": {
+		"nrf-connect.topdir": "${workspaceFolder}\\v2.1.2",
+		"nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}",
+		"nrf-connect.applications": [
+			"c:\\Dev\\ECG_Chestpatch"
+		],
+		"files.associations": {
+			"spi_config.h": "c",
+			"max30003.h": "c",
+			"utils.h": "c",
+			"algorithm": "c",
+			"*.tcc": "c",
+			"bitset": "c",
+			"charconv": "c",
+			"cmath": "c",
+			"complex": "c",
+			"cstddef": "c",
+			"cstdio": "c",
+			"cstdlib": "c",
+			"cstring": "c",
+			"cwchar": "c",
+			"cwctype": "c",
+			"forward_list": "c",
+			"list": "c",
+			"vector": "c",
+			"deque": "c",
+			"optional": "c",
+			"functional": "c",
+			"iterator": "c",
+			"memory": "c",
+			"numeric": "c",
+			"rb_tree": "c",
+			"rope": "c",
+			"slist": "c",
+			"fstream": "c",
+			"future": "c",
+			"iosfwd": "c",
+			"istream": "c",
+			"limits": "c",
+			"map": "c",
+			"memory_resource": "c",
+			"mutex": "c",
+			"ostream": "c",
+			"queue": "c",
+			"ranges": "c",
+			"set": "c",
+			"shared_mutex": "c",
+			"stack": "c",
+			"streambuf": "c",
+			"regex": "c",
+			"type_traits": "c",
+			"tuple": "c",
+			"utility": "c",
+			"valarray": "c"
+		},
+		"nrf-connect.debugging.bindings": {
+			"c:/Dev/ECG_Chestpatch/build": "Launch build"
+		}
+	}
+}

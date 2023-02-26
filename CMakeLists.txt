@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(hello_world)
+project(ECG_Chestpatch)
 
-target_sources(app PRIVATE src/main.c src/max30003.c src/spi_config.c)
+target_sources(app PRIVATE src/main.c src/max30003.c src/lsm6dsm.c src/spi_config.c)
 zephyr_library_include_directories(./include)

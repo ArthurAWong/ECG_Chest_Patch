@@ -181,7 +181,7 @@ int max_enable_ecg(void);
 
 int max_readstatus(void);
 
-int setup_interrupt(void);
+int max_read_ecg(int32_t *out_val);
 
 int max30003_write(uint8_t reg, void *data, size_t size);
 

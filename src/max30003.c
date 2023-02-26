@@ -9,47 +9,30 @@
 #define WRITE_REG(reg) ((reg << 1) & ~(1 << 0))
 #define READ_REG(reg) ((reg << 1) | (1 << 0))
 
-bool FIFO_Int_Flag = false;
-int int_lock_key;
+uint8_t max_buffer_tx[MAX_BUF_SIZE] = {};
+uint8_t max_buffer_rx[MAX_BUF_SIZE] = {};
 
-static const struct gpio_dt_spec gpio_fifo_int = 
-{
-    .port = DEVICE_DT_GET(DT_NODELABEL(gpio0)),
-    .pin = 4,
-    .dt_flags = GPIO_ACTIVE_LOW
-};
-static struct gpio_callback fifo_cb_data;
-
-uint8_t buffer_tx[MAX_BUF_SIZE] = {};
-uint8_t buffer_rx[MAX_BUF_SIZE] = {};
-
-uint8_t buffer_print_tx[MAX_BUF_SIZE * 5 + 1];
-uint8_t buffer_print_rx[MAX_BUF_SIZE * 5 + 1];
+uint8_t max_buffer_print_tx[MAX_BUF_SIZE * 5 + 1];
+uint8_t max_buffer_print_rx[MAX_BUF_SIZE * 5 + 1];
 
 /*Number inside the [] Tells us how many buffers*/
 /*.buf is the type of buffer*/
 /*.len is the length of the buffer*/
-struct spi_buf tx_bufs[2] = {};
+struct spi_buf max_tx_bufs[2] = {};
 
-struct spi_buf rx_bufs[2] = {};
+struct spi_buf max_rx_bufs[2] = {};
 
-const struct spi_buf_set tx = 
+const struct spi_buf_set max_tx = 
 {
-	.buffers = tx_bufs,
-	.count = ARRAY_SIZE(tx_bufs)
+	.buffers = max_tx_bufs,
+	.count = ARRAY_SIZE(max_tx_bufs)
 };
 
-const struct spi_buf_set rx = 
+const struct spi_buf_set max_rx = 
 {
-	.buffers = rx_bufs,
-	.count = ARRAY_SIZE(rx_bufs)
+	.buffers = max_rx_bufs,
+	.count = ARRAY_SIZE(max_rx_bufs)
 };
-
-void fifo_int_triggered(const struct device *dev, struct gpio_callback *cb,
-		    uint32_t pins)
-{
-    FIFO_Int_Flag = true;
-}
 
 /**
 * @brief Reading a register of the MAX
@@ -64,16 +47,16 @@ int max30003_read(uint8_t reg, void *data, size_t size)
 {
 	reg = READ_REG(reg);
 	uint8_t dummy;
-	tx_bufs[0].buf = &reg;
-	tx_bufs[0].len = 1;
-	tx_bufs[1].buf = NULL;
-	tx_bufs[1].len = 0;
-	rx_bufs[0].buf = &dummy;
-	rx_bufs[0].len = 1;
-	rx_bufs[1].buf = data;
-	rx_bufs[1].len = size;
+	max_tx_bufs[0].buf = &reg;
+	max_tx_bufs[0].len = 1;
+	max_tx_bufs[1].buf = NULL;
+	max_tx_bufs[1].len = 0;
+	max_rx_bufs[0].buf = &dummy;
+	max_rx_bufs[0].len = 1;
+	max_rx_bufs[1].buf = data;
+	max_rx_bufs[1].len = size;
 
-	int ret = spi_transceive(spi_device, &spi_cfg, &tx, &rx);
+	int ret = spi_transceive(spi_device, &max_spi_cfg, &max_tx, &max_rx);
 	return ret;
 }
 
@@ -89,11 +72,11 @@ int max30003_read(uint8_t reg, void *data, size_t size)
 int max30003_write(uint8_t reg, void *data, size_t size)
 {   
 	reg = WRITE_REG(reg);
-	tx_bufs[0].buf = &reg;
-	tx_bufs[0].len = 1;
-	tx_bufs[1].buf = data;
-	tx_bufs[1].len = size;
-	int ret = spi_transceive(spi_device, &spi_cfg, &tx, NULL);
+	max_tx_bufs[0].buf = &reg;
+	max_tx_bufs[0].len = 1;
+	max_tx_bufs[1].buf = data;
+	max_tx_bufs[1].len = size;
+	int ret = spi_transceive(spi_device, &max_spi_cfg, &max_tx, NULL);
 	return ret;
 }
 
@@ -103,11 +86,11 @@ int max30003_write_uint32(uint8_t reg, uint32_t data)
 
 	uint8_t write_out[3] = {(data >> 16) &(0xff), (data >> 8) &(0xff), (data >> 0) &(0xff)};
 	//uint8_t write_out[3] = {(data >> 0) &(0xff), (data >> 8) &(0xff), (data >> 16) &(0xff)};
-	tx_bufs[0].buf = &reg;
-	tx_bufs[0].len = 1;
-	tx_bufs[1].buf = write_out;
-	tx_bufs[1].len = 3;
-	int ret = spi_transceive(spi_device, &spi_cfg, &tx, NULL);
+	max_tx_bufs[0].buf = &reg;
+	max_tx_bufs[0].len = 1;
+	max_tx_bufs[1].buf = write_out;
+	max_tx_bufs[1].len = 3;
+	int ret = spi_transceive(spi_device, &max_spi_cfg, &max_tx, NULL);
 	if (ret != 0)
 	{
 		printk("Error spi writing!\n");
@@ -138,8 +121,8 @@ bool max_readinfo()
 	uint8_t data[3];
 
 	int ret = max30003_read(INFO, data, sizeof data);
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("Receiving: %s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("Receiving: %s\n", max_buffer_print_rx);
 	// printk("spi_transcieve returns %d \n", ret);
 
 	if ((data[0] & 0xF0) == 0x50)
@@ -165,8 +148,8 @@ int max_readstatus()
 {
 	uint8_t data[3];
 	int ret = max30003_read(STATUS, data, sizeof data);
-	to_display_format(data, 3, buffer_print_rx);
-	printk("Status Register: %s\n", buffer_print_rx);
+	to_display_format(data, 3, max_buffer_print_rx);
+	printk("Status Register: %s\n", max_buffer_print_rx);
 
 	if(ret != 0)
 	{
@@ -177,18 +160,9 @@ int max_readstatus()
 	return ret;
 }
 
-int setup_interrupt()
-{
-    gpio_pin_configure_dt(&gpio_fifo_int, (GPIO_INPUT | GPIO_PULL_UP));
-    gpio_pin_interrupt_configure_dt(&gpio_fifo_int, GPIO_INT_EDGE_FALLING);
-    gpio_init_callback(&fifo_cb_data, fifo_int_triggered, BIT(gpio_fifo_int.pin));
-	gpio_add_callback(gpio_fifo_int.port, &fifo_cb_data);
-}
-
 int max_enable_ecg()
 {
 	int ret;
-	uint8_t data[3] = {0x00, 0x00, 0x00};
 
 	uint32_t cnfg_gen_reg = (1 << CNFG_GEN_EN_ECG) | (1 << CNFG_GEN_RBIASN) | (1 << CNFG_GEN_RBIASP) | (1 << CNFG_GEN_EN_RBIAS)
 								| (2 << CNFG_GEN_IMAG) | (1 << CNFG_GEN_EN_DCLOFF);
@@ -214,61 +188,67 @@ int max_enable_ecg()
 	ret = max30003_write_uint32(CNFG_EMUX, cnfg_emux_reg);
 
 	// ret = max30003_read(CNFG_GEN, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 	// ret = max30003_read(CNFG_ECG, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 	// ret = max30003_read(CNFG_RTOR1, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 	// ret = max30003_read(MNGR_INT, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 	// ret = max30003_read(EN_INT, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 	// ret = max30003_read(MNGR_DYN, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 	// ret = max30003_read(CNFG_EMUX, data, sizeof(data));
-	// to_display_format(data, 3, buffer_print_rx);
-	// printk("%s\n", buffer_print_rx);
+	// to_display_format(data, 3, max_buffer_print_rx);
+	// printk("%s\n", max_buffer_print_rx);
 
 	ret = max30003_write_uint32(SYNCH, 0x00000000);
 	ret = max30003_write_uint32(FIFO_RST, 0x00000000);
 
-    while(1)
-	{
-		ret = max30003_read(STATUS, data, sizeof(data));
-		if (data[0] & (1 << 6))
-		{
-			{
-				printk("OVERFLOW!\n");
-				return;
-			}
-		}
-        if (data[0] & (1 << 7))  //FIFO_Int_Flag
-        {
-            ret = max30003_read(ECG_FIFO, data, sizeof(data));
-			//to_display_format(data, 3, buffer_print_rx);
-			//printk("%s\n", buffer_print_rx);
-			uint32_t ecg_data = ((data[0] << 16) | (data[1] << 8) | (data[2] << 0)) >> 6;
-			int32_t int_ecg_data;
-			if (ecg_data > 131072)
-			{
-				int_ecg_data = ecg_data - 262144;
-			} else
-			{
-				int_ecg_data = ecg_data;
-			}
-			float ecg_mv = int_ecg_data;
-			uint8_t data_tags = ((data[2] & (0x3F)) >> 3);
-			if (data_tags == 0)
-			{
-				printk("%d\n", int_ecg_data);
-			}
-        }
-	}
 	return ret;
+}
+
+int max_read_ecg(int32_t *out_val)
+{
+	int ret;
+	uint8_t data[3] = {0x00, 0x00, 0x00};
+	ret = max30003_read(STATUS, data, sizeof(data));
+	if (data[0] & (1 << 6))
+	{
+		printk("OVERFLOW!\n");
+		ret = max30003_write_uint32(FIFO_RST, 0x00000000);
+		return 1;
+	}
+
+	if (data[0] & (1 << 7))
+	{
+		ret = max30003_read(ECG_FIFO, data, sizeof(data));
+		//to_display_format(data, 3, max_buffer_print_rx);
+		//printk("%s\n", max_buffer_print_rx);
+		uint32_t ecg_data = ((data[0] << 16) | (data[1] << 8) | (data[2] << 0)) >> 6;
+		uint8_t data_tags = ((data[2] & (0x3F)) >> 3);
+		if (data_tags != 0)
+		{
+			return 1;
+		}
+		if (ecg_data > 131072)
+		{
+			*out_val = ecg_data - 262144;
+		} else
+		{
+			*out_val = ecg_data;
+		}
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
 }

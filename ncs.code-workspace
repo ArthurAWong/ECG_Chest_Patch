@@ -6,13 +6,18 @@
 		{
 			"name": "ECG_Chestpatch",
 			"path": "."
+		},
+		{
+			"name": "peripheral_hr",
+			"path": "../peripheral_hr"
 		}
 	],
 	"settings": {
 		"nrf-connect.topdir": "${workspaceFolder}\\v2.1.2",
 		"nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}",
 		"nrf-connect.applications": [
-			"c:\\Dev\\ECG_Chestpatch"
+			"c:\\Dev\\ECG_Chestpatch",
+			"c:\\Dev\\peripheral_hr"
 		],
 		"files.associations": {
 			"spi_config.h": "c",
@@ -61,7 +66,12 @@
 			"type_traits": "c",
 			"tuple": "c",
 			"utility": "c",
-			"valarray": "c"
+			"valarray": "c",
+			"hrs.h": "c",
+			"array": "c",
+			"string": "c",
+			"string_view": "c",
+			"span": "c"
 		},
 		"nrf-connect.debugging.bindings": {
 			"c:/Dev/ECG_Chestpatch/build": "Launch build"

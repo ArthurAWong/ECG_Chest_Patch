@@ -238,8 +238,8 @@ int max_enable_ecg()
 	ret = max30003_write_uint32(SYNCH, 0x00000000);
 	ret = max30003_write_uint32(FIFO_RST, 0x00000000);
 
-    while(1)
-	{
+    // while(1)
+	// {
 		ret = max30003_read(STATUS, data, sizeof(data));
 		if (data[0] & (1 << 6))
 		{
@@ -269,6 +269,6 @@ int max_enable_ecg()
 				printk("%d\n", int_ecg_data);
 			}
         }
-	}
+	// }
 	return ret;
 }

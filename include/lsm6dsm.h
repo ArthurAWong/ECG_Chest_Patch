@@ -186,6 +186,7 @@
 
 void lsm6dsm_test();
 
+int lsm6dsm_enable_accel();
 int lsm6dsm_write_buffer(uint8_t reg, uint8_t data);
 int lsm6dsm_read_buffer(uint8_t reg, uint8_t *out_data);
 

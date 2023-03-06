@@ -72,6 +72,17 @@ int lsm6dsm_read_buffer(uint8_t reg, uint8_t *out_data)
     return ret;
 }
 
+int lsm6dsm_enable_accel()
+{
+	int ret;
+	ret = lsm6dsm_write_buffer(LSM6DSM_CTRL1_XL, 0x10); // Enable accelerometer to produce an output data rate of 12.5 Hz
+	if (!ret)
+	{
+		return -1;
+	}
+	return 0;
+}
+
 int lsm6dsm_read_accel(float *out_xyz)
 {
 	uint8_t out_var = 0;

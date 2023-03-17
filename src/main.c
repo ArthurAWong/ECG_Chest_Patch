@@ -29,7 +29,7 @@
 #include <errno.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/sys/byteorder.h>
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
@@ -45,7 +45,7 @@ static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
 		      BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
-		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL))
+		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
 };
 
 static void connected(struct bt_conn *conn, uint8_t err)
@@ -95,32 +95,84 @@ static struct bt_conn_auth_cb auth_cb_display = {
 	.cancel = auth_cancel,
 };
 
-static void bas_notify(void)
-{
-	uint8_t battery_level = bt_bas_get_battery_level();
-
-	battery_level--;
-
-	if (!battery_level) {
-		battery_level = 100U;
-	}
-
-	bt_bas_set_battery_level(battery_level);
-}
-
 static void ecg_notify(void)
 {
-	static uint8_t ecg_val[3] = {0x00, 0x00, 0x00};
-	// ecg_val++;
-	// if(ecg_val == 100)
-	// {
-	// 	ecg_val=0;
-	// }
-	int err = max30003_read(ECG_FIFO, &ecg_val, sizeof(ecg_val));
-	uint32_t ecg_data = ((ecg_val[0] << 16) | (ecg_val[1] << 8) | (ecg_val[2] << 0)) >> 6;
-	uint16_t eight_bit_ECG_data = (uint16_t) ecg_data;
+	// Actual way to do it, for now commented out
+	// TODO: uncomment the following code
+	// static uint8_t ecg_val[3] = {0x00, 0x00, 0x00};
+	// int err = max30003_read(ECG_FIFO, &ecg_val, sizeof(ecg_val));
+	// uint32_t ecg_data = ((ecg_val[0] << 16) | (ecg_val[1] << 8) | (ecg_val[2] << 0)) >> 6;
+	// uint16_t eight_bit_ECG_data = (uint16_t) ecg_data;
+
+	// Following code is just a test for Vince's debugging
+	static uint16_t eight_bit_ECG_data = 0;
+	eight_bit_ECG_data = 4;
+	if(eight_bit_ECG_data == 100)
+	{
+		eight_bit_ECG_data = 0;
+	}
 
 	bt_ecg_notify(eight_bit_ECG_data);
+}
+
+static void xaccel_notify(void)
+{
+
+	// Following code is just a test for Vince's debugging
+	// TODO: replace with actual read accelerometer code
+	static uint32_t xaccel_data = 0;
+	xaccel_data = 0;
+	if(xaccel_data == 100)
+	{
+		xaccel_data = 0;
+	}
+
+	bt_xaccel_notify(xaccel_data);
+}
+
+static void yaccel_notify(void)
+{
+
+	// Following code is just a test for Vince's debugging
+	// TODO: replace with actual read accelerometer code
+	static uint32_t yaccel_data = 0;
+	yaccel_data = 1;
+	if(yaccel_data == 100)
+	{
+		yaccel_data = 0;
+	}
+
+	bt_yaccel_notify(yaccel_data);
+}
+
+static void zaccel_notify(void)
+{
+
+	// Following code is just a test for Vince's debugging
+	// TODO: replace with actual read accelerometer code
+	static uint32_t zaccel_data = 0;
+	zaccel_data = 2;
+	if(zaccel_data == 100)
+	{
+		zaccel_data = 0;
+	}
+
+	bt_zaccel_notify(zaccel_data);
+}
+
+static void gyro_notify(void)
+{
+
+	// Following code is just a test for Vince's debugging
+	// TODO: replace with actual read accelerometer code
+	static uint32_t gyro_data = 0;
+	gyro_data = 3;
+	if(gyro_data == 100)
+	{
+		gyro_data = 0;
+	}
+
+	bt_gyro_notify(gyro_data);
 }
 
 void main(void)
@@ -150,7 +202,10 @@ void main(void)
 
 		/* Heartrate measurements simulation */
 		ecg_notify();
-
+		xaccel_notify();
+		yaccel_notify();
+		zaccel_notify();
+		gyro_notify();
 		/* Battery level simulation */
 		// bas_notify();
 	}

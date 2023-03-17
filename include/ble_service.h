@@ -21,15 +21,19 @@
 extern "C" {
 #endif
 
-/** @brief Notify heart rate measurement.
+/** @brief Notify ecg measurement.
  *
  * This will send a GATT notification to all current subscribers.
  *
- *  @param heartrate The heartrate measurement in beats per minute.
+ *  @param ecg_val The ecg measurement as read from device.
  *
  *  @return Zero in case of success and error code in case of error.
  */
-int bt_ecg_notify(uint16_t ecg_val);
+int bt_ecg_notify(uint16_t val);
+int bt_xaccel_notify(uint16_t val);
+int bt_yaccel_notify(uint16_t val);
+int bt_zaccel_notify(uint16_t val);
+int bt_gyro_notify(uint16_t val);
 
 #ifdef __cplusplus
 }

@@ -80,10 +80,10 @@ LOG_MODULE_REGISTER(ecg);
 
 
 static uint16_t ecg_reading;
-static uint32_t accelx_reading;
-static uint32_t accely_reading;
-static uint32_t accelz_reading;
-static uint32_t gyro_reading;
+static uint16_t accelx_reading;
+static uint16_t accely_reading;
+static uint16_t accelz_reading;
+static uint16_t gyro_reading;
 
 static void ecg_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
 {
@@ -135,7 +135,7 @@ static void gyro_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value
 BT_GATT_SERVICE_DEFINE(ecg_svc,
 	BT_GATT_PRIMARY_SERVICE(BT_UUID_ECG_SERVICE),
 	BT_GATT_CHARACTERISTIC(BT_ECG_CHRC, BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
+			       BT_GATT_PERM_NONE, NULL, NULL, &ecg_reading),
 	BT_GATT_CCC(ecg_ccc_cfg_changed,
 		    HRS_GATT_PERM_DEFAULT),
 );
@@ -144,19 +144,19 @@ BT_GATT_SERVICE_DEFINE(ecg_svc,
 BT_GATT_SERVICE_DEFINE(accelerometer_svc,
 	BT_GATT_PRIMARY_SERVICE(BT_UUID_ACCELEROMETER_SERVICE1),
 	BT_GATT_CHARACTERISTIC(BT_XACCEL_CHRC, BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
+			       BT_GATT_PERM_NONE, NULL, NULL, &accelx_reading),
 	BT_GATT_CCC(xaccel_ccc_cfg_changed,
 		    HRS_GATT_PERM_DEFAULT),
 	BT_GATT_CHARACTERISTIC(BT_YACCEL_CHRC, BT_GATT_CHRC_NOTIFY,
-			       BT_GATT_PERM_NONE, NULL, NULL, NULL),
+			       BT_GATT_PERM_NONE, NULL, NULL, &accely_reading),
 	BT_GATT_CCC(yaccel_ccc_cfg_changed,
 		    HRS_GATT_PERM_DEFAULT),
 	BT_GATT_CHARACTERISTIC(BT_ZACCEL_CHRC, BT_GATT_CHRC_NOTIFY,
-				BT_GATT_PERM_NONE, NULL, NULL, NULL),
+				BT_GATT_PERM_NONE, NULL, NULL, &accelz_reading),
 	BT_GATT_CCC(zaccel_ccc_cfg_changed,
 		    HRS_GATT_PERM_DEFAULT),
 	BT_GATT_CHARACTERISTIC(BT_GYRO_CHRC, BT_GATT_CHRC_NOTIFY,
-				BT_GATT_PERM_NONE, NULL, NULL, NULL),
+				BT_GATT_PERM_NONE, NULL, NULL, &gyro_reading),
 	BT_GATT_CCC(gyro_ccc_cfg_changed,
 		    HRS_GATT_PERM_DEFAULT),
 	
@@ -177,11 +177,10 @@ static int chestpatch_val_init(const struct device *dev)
 int bt_ecg_notify(uint16_t val)
 {
 	int rc;
-	static uint16_t ecg;
 
-	ecg = val;
+	ecg_reading = val;
 
-	rc = bt_gatt_notify(NULL, &ecg_svc.attrs[1], &ecg, sizeof(ecg));
+	rc = bt_gatt_notify(NULL, &ecg_svc.attrs[1], &ecg_reading, sizeof(ecg_reading));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }
@@ -189,23 +188,27 @@ int bt_ecg_notify(uint16_t val)
 int bt_xaccel_notify(uint16_t val)
 {
 	int rc;
-	static uint16_t xaccel;
+	// static uint8_t xaccel[2];
 
-	xaccel = val;
+	// xaccel[0] = 0x00;
+	// xaccel[1] = val;
+	accelx_reading = val;
 
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[1], &xaccel, sizeof(xaccel));
-
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[1], &accelx_reading, sizeof(accelx_reading));
+	
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
 int bt_yaccel_notify(uint16_t val)
 {
 	int rc;
-	static uint16_t yaccel;
+	// static uint16_t yaccel[3];
 
-	yaccel = val;
+	// yaccel[0] = 0x00;
+	// yaccel[1] = val;
+	accely_reading = val;
 
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[2], &yaccel, sizeof(yaccel));
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[2], &accely_reading, sizeof(accely_reading));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }
@@ -213,11 +216,13 @@ int bt_yaccel_notify(uint16_t val)
 int bt_zaccel_notify(uint16_t val)
 {
 	int rc;
-	static uint16_t zaccel;
+	// static uint16_t zaccel[2];
 
-	zaccel = val;
+	// zaccel[0] = 0x00;
+	// zaccel[1] = val;
+	accelz_reading = val;
 
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[3], &zaccel, sizeof(zaccel));
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[4], &accelz_reading, sizeof(accelz_reading));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }
@@ -225,11 +230,13 @@ int bt_zaccel_notify(uint16_t val)
 int bt_gyro_notify(uint16_t val)
 {
 	int rc;
-	static uint16_t gyro;
+	// static uint16_t gyro[2];
 
-	gyro = val;
+	// gyro[0] = 0x00;
+	// gyro[1] = val;
 
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[4], &gyro, sizeof(gyro));
+	gyro_reading = val;
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[6], &gyro_reading, sizeof(gyro_reading));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }

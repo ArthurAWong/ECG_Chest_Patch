@@ -39,6 +39,7 @@ struct spi_config max_spi_cfg =
 	.cs = (&max_spi_cs)
 };
 
+
 struct spi_config accel_spi_cfg = 
 {
 	.frequency = 250000,

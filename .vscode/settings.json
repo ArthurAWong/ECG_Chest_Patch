@@ -6,6 +6,10 @@
     "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}",
     "files.associations": {
         "max30003.h": "c",
-        "spi_config.h": "c"
+        "spi_config.h": "c",
+        "zephyr.h": "c",
+        "device.h": "c",
+        "typeinfo": "c",
+        "gpio.h": "c"
     }
 }

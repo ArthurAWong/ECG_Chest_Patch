@@ -163,7 +163,7 @@ static void gyro_notify(void)
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static uint32_t gyro_data = 3;
+	static uint32_t gyro_data = 2;
 	gyro_data += 1;
 	if(gyro_data == 100)
 	{
@@ -171,6 +171,36 @@ static void gyro_notify(void)
 	}
 
 	bt_gyro_notify(gyro_data);
+}
+
+static void gyroy_notify(void)
+{
+
+	// Following code is just a test for Vince's debugging
+	// TODO: replace with actual read accelerometer code
+	static uint32_t gyro_data = 3;
+	gyro_data += 1;
+	if(gyro_data == 100)
+	{
+		gyro_data = 0;
+	}
+
+	bt_gyroy_notify(gyro_data);
+}
+
+static void gyroz_notify(void)
+{
+
+	// Following code is just a test for Vince's debugging
+	// TODO: replace with actual read accelerometer code
+	static uint32_t gyro_data = 4;
+	gyro_data += 1;
+	if(gyro_data == 100)
+	{
+		gyro_data = 0;
+	}
+
+	bt_gyroz_notify(gyro_data);
 }
 
 void main(void)
@@ -196,7 +226,7 @@ void main(void)
 	 * of starting delayed work so we do it here
 	 */
 	while (1) {
-		k_sleep(K_SECONDS(1));
+		// k_sleep(K_SECONDS(1));
 
 		/* Heartrate measurements simulation */
 		ecg_notify();
@@ -204,6 +234,8 @@ void main(void)
 		yaccel_notify();
 		zaccel_notify();
 		gyro_notify();
+		gyroy_notify();
+		gyroz_notify();
 		/* Battery level simulation */
 		// bas_notify();
 	}

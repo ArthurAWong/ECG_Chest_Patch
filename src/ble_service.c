@@ -78,12 +78,19 @@ LOG_MODULE_REGISTER(ecg);
 #define BT_GYRO_CHRC_VAL BT_UUID_128_ENCODE(0xff3675ff, 0x5479, 0x4e1c, 0x9d87, 0xa0ac6e2dadbf) //ff3675ff-5479-4e1c-9d87-a0ac6e2dadbf
 #define BT_GYRO_CHRC BT_UUID_DECLARE_128(BT_GYRO_CHRC_VAL)
 
+#define BT_GYROY_CHRC_VAL BT_UUID_128_ENCODE(0xc040eb24, 0x7174, 0x4f86, 0xa547, 0x659b538d9c31) // c040eb24-7174-4f86-a547-659b538d9c31
+#define BT_GYROY_CHRC BT_UUID_DECLARE_128(BT_GYROY_CHRC_VAL)
+
+#define BT_GYROZ_CHRC_VAL BT_UUID_128_ENCODE(0x4f30dd9e, 0x9c7c, 0x48d5, 0xb071, 0xd1924af65ac6) // 4f30dd9e-9c7c-48d5-b071-d1924af65ac6
+#define BT_GYROZ_CHRC BT_UUID_DECLARE_128(BT_GYROZ_CHRC_VAL)
 
 static uint16_t ecg_reading;
 static uint32_t accelx_reading;
 static uint32_t accely_reading;
 static uint32_t accelz_reading;
 static uint32_t gyro_reading;
+static uint32_t gyroy_reading;
+static uint32_t gyroz_reading;
 
 static void ecg_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
 {
@@ -130,6 +137,24 @@ static void gyro_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
+static void gyroy_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+
+	bool notif_enabled = (value == BT_GATT_CCC_NOTIFY);
+
+	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
+}
+
+static void gyroz_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+{
+	ARG_UNUSED(attr);
+
+	bool notif_enabled = (value == BT_GATT_CCC_NOTIFY);
+
+	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
+}
+
 
 /* ECG Service Declaration */
 BT_GATT_SERVICE_DEFINE(ecg_svc,
@@ -159,6 +184,14 @@ BT_GATT_SERVICE_DEFINE(accelerometer_svc,
 				BT_GATT_PERM_NONE, NULL, NULL, NULL),
 	BT_GATT_CCC(gyro_ccc_cfg_changed,
 		    HRS_GATT_PERM_DEFAULT),
+	BT_GATT_CHARACTERISTIC(BT_GYROY_CHRC, BT_GATT_CHRC_NOTIFY,
+				BT_GATT_PERM_NONE, NULL, NULL, NULL),
+	BT_GATT_CCC(gyroy_ccc_cfg_changed,
+		    HRS_GATT_PERM_DEFAULT),
+	BT_GATT_CHARACTERISTIC(BT_GYROZ_CHRC, BT_GATT_CHRC_NOTIFY,
+				BT_GATT_PERM_NONE, NULL, NULL, NULL),
+	BT_GATT_CCC(gyroz_ccc_cfg_changed,
+		    HRS_GATT_PERM_DEFAULT),
 	
 );
 
@@ -171,6 +204,8 @@ static int chestpatch_val_init(const struct device *dev)
 	accely_reading = 0x00;
 	accelz_reading = 0x00;
 	gyro_reading = 0x00;
+	gyroy_reading = 0x00;
+	gyroz_reading = 0x00;
 	return 0;
 }
 
@@ -230,6 +265,30 @@ int bt_gyro_notify(uint16_t val)
 	gyro = val;
 
 	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[11], &gyro, sizeof(gyro));
+
+	return rc == -ENOTCONN ? 0 : rc;
+}
+
+int bt_gyroy_notify(uint16_t val)
+{
+	int rc;
+	static uint16_t gyroy;
+
+	gyroy = val;
+
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[14], &gyroy, sizeof(gyroy));
+
+	return rc == -ENOTCONN ? 0 : rc;
+}
+
+int bt_gyroz_notify(uint16_t val)
+{
+	int rc;
+	static uint16_t gyroz;
+
+	gyroz = val;
+
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[17], &gyroz, sizeof(gyroz));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }

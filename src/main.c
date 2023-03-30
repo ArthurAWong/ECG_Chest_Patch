@@ -36,15 +36,13 @@
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
-#include <zephyr/bluetooth/services/bas.h>
+
 #include "ble_service.h"
 #include "max30003.h"
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
-		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
 };
 
@@ -105,8 +103,8 @@ static void ecg_notify(void)
 	// uint16_t eight_bit_ECG_data = (uint16_t) ecg_data;
 
 	// Following code is just a test for Vince's debugging
-	static uint16_t eight_bit_ECG_data = 0;
-	eight_bit_ECG_data = 65535;
+	static uint16_t eight_bit_ECG_data = 4;
+	eight_bit_ECG_data += 1;
 	if(eight_bit_ECG_data == 100)
 	{
 		eight_bit_ECG_data = 0;
@@ -120,7 +118,8 @@ static void xaccel_notify(void)
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static uint16_t xaccel_data = 4132;
+	static uint32_t xaccel_data = 0;
+	xaccel_data += 1;
 	if(xaccel_data == 100)
 	{
 		xaccel_data = 0;
@@ -134,7 +133,8 @@ static void yaccel_notify(void)
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static uint16_t yaccel_data = 10;
+	static uint32_t yaccel_data = 1;
+	yaccel_data += 1;
 	if(yaccel_data == 100)
 	{
 		yaccel_data = 0;
@@ -148,7 +148,8 @@ static void zaccel_notify(void)
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static uint16_t zaccel_data = 49;
+	static uint32_t zaccel_data = 2;
+	zaccel_data += 2;
 	if(zaccel_data == 100)
 	{
 		zaccel_data = 0;
@@ -162,7 +163,8 @@ static void gyro_notify(void)
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static uint16_t gyro_data = 99;
+	static uint32_t gyro_data = 3;
+	gyro_data += 1;
 	if(gyro_data == 100)
 	{
 		gyro_data = 0;
@@ -193,8 +195,8 @@ void main(void)
 	/* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
 	 */
-	// while (1) {
-		// k_sleep(K_SECONDS(1));
+	while (1) {
+		k_sleep(K_SECONDS(1));
 
 		/* Heartrate measurements simulation */
 		ecg_notify();
@@ -204,5 +206,6 @@ void main(void)
 		gyro_notify();
 		/* Battery level simulation */
 		// bas_notify();
-	// }
+	}
 }
+

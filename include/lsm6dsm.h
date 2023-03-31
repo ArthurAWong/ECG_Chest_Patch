@@ -189,5 +189,8 @@ void lsm6dsm_test();
 int lsm6dsm_enable_accel();
 int lsm6dsm_write_buffer(uint8_t reg, uint8_t data);
 int lsm6dsm_read_buffer(uint8_t reg, uint8_t *out_data);
+int lsm6dsm_read_status(uint8_t *status_data);
+int lsm6dsm_read_accel(float *out_xyz);
+int lsm6dsm_read_gyro(float *out_xyz);
 
 #endif // LSM6DSM

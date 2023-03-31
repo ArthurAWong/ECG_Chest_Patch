@@ -37,10 +37,10 @@ def readPort():
     if not data:
         pass
     else:
-        retval = re.findall(r'^[-]?[0-9]+', data)
-        if retval == []:
+        retval = re.findall(r'^[-]?[0-9]+', data) 
+        if len(retval) != 1:
             retval = re.findall(r'-?\d+\.\d+|-?\d+',data)
-
+    print(retval)
     return retval
 
 

@@ -213,10 +213,8 @@ void main(void)
 	// max_readstatus();
 
 	int ret;
-	uint8_t lsm6dsm_status;
-	float accel_xyz[3] = {};
-	float gyro_xyz[3] = {};
-	uint8_t ecg_num;
+	float xyz[3] = {};
+	uint32_t ecg_num;
 
 	lsm6dsm_enable_accel();
 	lsm6dsm_enable_gyro();

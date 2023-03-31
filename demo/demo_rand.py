@@ -31,15 +31,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.top_plot_widget.setLabel("left", "Amplitude", units="V")
         self.top_plot_widget.setLabel("bottom", "Time", units="s")
-
-        self.top_plot_curve = self.top_plot_widget.plot(self.top_plot_data)
+        self.top_plot_widget.setBackground("white")
+        self.top_plot_curve = self.top_plot_widget.plot(self.top_plot_data,pen=pg.mkPen('black',width=3))
 
         self.bottom_plot_widget = pg.PlotWidget()
         central_layout.addWidget(self.bottom_plot_widget)
 
         self.bottom_plot_widget.setLabel("left", "Acceleration", units="m/s^2")
         self.bottom_plot_widget.hideAxis('bottom')
-
+        self.bottom_plot_widget.setBackground("white")
         self.bar_graph_item = pg.BarGraphItem(
             x=range(3), height=[0, 0, 0], width=0.3, brush="r"
         )
@@ -64,7 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
         heights = np.random.normal(size=(3,))
         x = np.arange(3)
         
-        self.bar_graph_item.setOpts(height=heights, x=range(3), brush='r', labels={i: f"Bar {i}" for i in self.axis})
+        self.bar_graph_item.setOpts(height=heights, x=range(3), brush='black', labels={i: f"Bar {i}" for i in self.axis})
 
         
 

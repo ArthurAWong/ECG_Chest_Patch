@@ -15,13 +15,39 @@
 	status = "okay";
 };
 
+&pinctrl {
+	spi1_default: spi1_default {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 13)>,
+				<NRF_PSEL(SPIM_MOSI, 0, 18)>,
+				<NRF_PSEL(SPIM_MISO, 0, 26)>;
+		};
+	};
+
+	spi1_sleep: spi1_sleep {
+		group1 {
+			psels = <NRF_PSEL(SPIM_SCK, 0, 13)>,
+				<NRF_PSEL(SPIM_MOSI, 0, 18)>,
+				<NRF_PSEL(SPIM_MISO, 0, 26)>;
+			low-power-enable;
+		};
+	};
+};
+
 &spi1 {
 	status = "okay";
-	cs-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>,
-				<&gpio0 4 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&spi1_default>;
+	pinctrl-1 = <&spi1_sleep>;
+	pinctrl-names = "default", "sleep";
+	cs-gpios = <&gpio0 11 GPIO_ACTIVE_LOW>,
+				<&gpio0 12 GPIO_ACTIVE_LOW>;
 
 };
 
 &uart0 {
 	current-speed = < 115200 >;
+};
+
+arduino_i2c: &i2c0 {
+	status = "disabled";
 };

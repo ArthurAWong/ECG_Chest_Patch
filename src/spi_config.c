@@ -13,7 +13,7 @@ struct spi_cs_control max_spi_cs =
 	.gpio = 
 	{
 		.port = DEVICE_DT_GET(DT_NODELABEL(gpio0)),
-		.pin = 28,
+		.pin = 11,
 		.dt_flags = GPIO_ACTIVE_LOW
 	},
 	.delay = 0
@@ -24,7 +24,7 @@ struct spi_cs_control accel_spi_cs =
 	.gpio = 
 	{
 		.port = DEVICE_DT_GET(DT_NODELABEL(gpio0)),
-		.pin = 4,
+		.pin = 12,
 		.dt_flags = GPIO_ACTIVE_LOW
 	},
 	.delay = 0

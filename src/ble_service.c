@@ -84,15 +84,15 @@ LOG_MODULE_REGISTER(ecg);
 #define BT_GYROZ_CHRC_VAL BT_UUID_128_ENCODE(0x4f30dd9e, 0x9c7c, 0x48d5, 0xb071, 0xd1924af65ac6) // 4f30dd9e-9c7c-48d5-b071-d1924af65ac6
 #define BT_GYROZ_CHRC BT_UUID_DECLARE_128(BT_GYROZ_CHRC_VAL)
 
-static uint16_t ecg_reading;
-static uint32_t accelx_reading;
-static uint32_t accely_reading;
-static uint32_t accelz_reading;
-static uint32_t gyro_reading;
-static uint32_t gyroy_reading;
-static uint32_t gyroz_reading;
+static int32_t ecg_reading;
+static int16_t accelx_reading;
+static int16_t accely_reading;
+static int16_t accelz_reading;
+static int16_t gyro_reading;
+static int16_t gyroy_reading;
+static int16_t gyroz_reading;
 
-static void ecg_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void ecg_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -101,7 +101,7 @@ static void ecg_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
-static void xaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void xaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -110,7 +110,7 @@ static void xaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t val
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
-static void yaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void yaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -119,7 +119,7 @@ static void yaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t val
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
-static void zaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void zaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -128,7 +128,7 @@ static void zaccel_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t val
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
-static void gyro_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void gyro_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -137,7 +137,7 @@ static void gyro_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
-static void gyroy_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void gyroy_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -146,7 +146,7 @@ static void gyroy_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t valu
 	LOG_INF("notifications %s", notif_enabled ? "enabled" : "disabled");
 }
 
-static void gyroz_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value)
+static void gyroz_ccc_cfg_changed(const struct bt_gatt_attr *attr, int16_t value)
 {
 	ARG_UNUSED(attr);
 
@@ -209,10 +209,10 @@ static int chestpatch_val_init(const struct device *dev)
 	return 0;
 }
 
-int bt_ecg_notify(uint16_t val)
+int bt_ecg_notify(int32_t val)
 {
 	int rc;
-	static uint16_t ecg;
+	static int32_t ecg;
 
 	ecg = val;
 
@@ -221,10 +221,10 @@ int bt_ecg_notify(uint16_t val)
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_xaccel_notify(uint16_t val)
+int bt_xaccel_notify(int16_t val)
 {
 	int rc;
-	static uint16_t xaccel;
+	static int16_t xaccel;
 
 	xaccel = val;
 
@@ -233,10 +233,10 @@ int bt_xaccel_notify(uint16_t val)
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_yaccel_notify(uint16_t val)
+int bt_yaccel_notify(int16_t val)
 {
 	int rc;
-	static uint16_t yaccel;
+	static int16_t yaccel;
 
 	yaccel = val;
 
@@ -245,10 +245,10 @@ int bt_yaccel_notify(uint16_t val)
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_zaccel_notify(uint16_t val)
+int bt_zaccel_notify(int16_t val)
 {
 	int rc;
-	static uint16_t zaccel;
+	static int16_t zaccel;
 
 	zaccel = val;
 
@@ -257,10 +257,10 @@ int bt_zaccel_notify(uint16_t val)
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_gyro_notify(uint16_t val)
+int bt_gyrox_notify(int16_t val)
 {
 	int rc;
-	static uint16_t gyro;
+	static int16_t gyro;
 
 	gyro = val;
 
@@ -269,10 +269,10 @@ int bt_gyro_notify(uint16_t val)
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_gyroy_notify(uint16_t val)
+int bt_gyroy_notify(int16_t val)
 {
 	int rc;
-	static uint16_t gyroy;
+	static int16_t gyroy;
 
 	gyroy = val;
 
@@ -281,10 +281,10 @@ int bt_gyroy_notify(uint16_t val)
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_gyroz_notify(uint16_t val)
+int bt_gyroz_notify(int16_t val)
 {
 	int rc;
-	static uint16_t gyroz;
+	static int16_t gyroz;
 
 	gyroz = val;
 

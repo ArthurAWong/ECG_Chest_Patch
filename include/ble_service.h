@@ -29,11 +29,13 @@ extern "C" {
  *
  *  @return Zero in case of success and error code in case of error.
  */
-int bt_ecg_notify(uint16_t val);
-int bt_xaccel_notify(uint16_t val);
-int bt_yaccel_notify(uint16_t val);
-int bt_zaccel_notify(uint16_t val);
-int bt_gyro_notify(uint16_t val);
+int bt_ecg_notify(int32_t val);
+int bt_xaccel_notify(int16_t val);
+int bt_yaccel_notify(int16_t val);
+int bt_zaccel_notify(int16_t val);
+int bt_gyrox_notify(int16_t val);
+int bt_gyroy_notify(int16_t val);
+int bt_gyroz_notify(int16_t val);
 
 #ifdef __cplusplus
 }

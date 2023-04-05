@@ -168,7 +168,7 @@ int max_enable_ecg()
 								| (2 << CNFG_GEN_IMAG) | (1 << CNFG_GEN_EN_DCLOFF);
 	ret = max30003_write_uint32(CNFG_GEN, cnfg_gen_reg);
 
-    uint32_t cnfg_ecg_reg = (0b01 << CNFG_ECG_DLPF) | (0 << CNFG_ECG_DHPF) | (0b11 << CNFG_ECG_GAIN) | (0b10 << CNFG_ECG_RATE);
+    uint32_t cnfg_ecg_reg = (0b10 << CNFG_ECG_DLPF) | (0 << CNFG_ECG_DHPF) | (0b11 << CNFG_ECG_GAIN) | (0b10 << CNFG_ECG_RATE);
 	ret = max30003_write_uint32(CNFG_ECG, cnfg_ecg_reg);
 
     uint32_t cnfg_rtor_reg = (0b0011 << CNFG_RTOR1_WNDW) | (0b1111 << CNFG_RTOR1_GAIN) | (0b11 << CNFG_RTOR1_PAVG) 

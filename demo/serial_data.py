@@ -37,10 +37,22 @@ def readPort():
     if not data:
         pass
     else:
-        retval = re.findall(r'^[-]?[0-9]+', data) 
-        if len(retval) != 1:
-            retval = re.findall(r'-?\d+\.\d+|-?\d+',data)
-    print(retval)
+  
+        retval = []
+        if "Accel" in data:
+            retval.append("Accel")
+            retval += re.findall(r'-?\d+\.\d+|-?\d+',data)
+            
+        elif "Gyro" in data:
+            retval.append("Gyro")
+            retval += re.findall(r'-?\d+\.\d+|-?\d+',data)
+            
+        else:
+            retval.append("ECG")
+            retval += re.findall(r'^[-]?[0-9]+', data) 
+            
+
+    
     return retval
 
 

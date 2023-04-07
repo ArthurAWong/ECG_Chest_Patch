@@ -11,7 +11,8 @@ class MainWindow(QtWidgets.QMainWindow):
     bottom_plot_data = np.random.normal(size=(10, 3))
     axis = ('x','y','z')
     ecg_data = 0
-    accel_data = [0,0,0]
+    accel_data = [0,0,9.81]
+    gyro_data = [0,0,0]
     def __init__(self):
         super(MainWindow, self).__init__()
         uic.loadUi(os.path.join(os.path.dirname(__file__), "window.ui"), self)
@@ -44,8 +45,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.bottom_plot_widget.setLabel("left", "Acceleration", units="m/s^2")
         self.bottom_plot_widget.hideAxis('bottom')
 
-        self.bar_graph_item = pg.BarGraphItem(
-            x=range(3), height=[0, 0, 0], width=0.3, brush="blue"
+        self.bot_plot_widget.setBackground("black")
+        self.bot_plot_widget.setLabel("left", "Gyroscope", units="°/s")
+        self.bot_plot_widget.hideAxis('bottom')
+
+        self.accel_graph = pg.BarGraphItem(
+            x=range(3), height=[0, 0, 0], width=0.3, brush="green"
         )
         
         self.bottom_plot_widget.addItem(self.bar_graph_item)
@@ -62,13 +67,25 @@ class MainWindow(QtWidgets.QMainWindow):
     def update(self):
         # Generate new data for the 2D plot
         readval = serial_data.readPort()
-        for i in range(5):
+
+        print(readval)
+        if len(readval) > 4 or len(readval) < 2:
+            pass
+        
+        elif readval[0] == "Accel":
+            readval.pop(0)
             if len(readval) == 3:
                 self.accel_data = list(map(float, readval))
-                break
-            else:    
-                self.ecg_data = float(readval[0])
-                break
+
+        elif readval[0] == "Gyro":
+            readval.pop(0)
+            if len(readval) == 3:
+                self.gyro_data = list(map(float, readval))             
+                   
+        elif readval[0] == "ECG":
+            readval.pop(0)
+            self.ecg_data = float(readval[-1])
+            
 
         self.top_plot_data[:-1] = self.top_plot_data[1:]
         self.top_plot_data[-1] = self.ecg_data

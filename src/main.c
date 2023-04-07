@@ -119,14 +119,15 @@ static void ecg_notify(void)
 	// uint16_t eight_bit_ECG_data = (uint16_t) ecg_data;
 
 	// Following code is just a test for Vince's debugging
-	// static uint16_t eight_bit_ECG_data = 4;
-	// eight_bit_ECG_data += 1;
-	// if(eight_bit_ECG_data == 100)
-	// {
-	// 	eight_bit_ECG_data = 0;
-	// }
+	static int16_t eight_bit_ECG_data = 4;
+	eight_bit_ECG_data += 1;
+	if (eight_bit_ECG_data == 100)
+	{
+		eight_bit_ECG_data = 0;
+	}
 
-	bt_ecg_notify(ecg_num);
+	// bt_ecg_notify(ecg_num);
+	bt_ecg_notify(eight_bit_ECG_data);
 }
 
 static void xaccel_notify(void)
@@ -134,11 +135,11 @@ static void xaccel_notify(void)
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static int16_t xaccel_data = 0;
+	static int16_t xaccel_data = 0xfade;
 	xaccel_data += 1;
-	if(xaccel_data == 100)
+	if (xaccel_data == 0xfffe)
 	{
-		xaccel_data = 0;
+		xaccel_data = 0xfade;
 	}
 
 	bt_xaccel_notify(xaccel_data);
@@ -185,8 +186,14 @@ static void gyrox_notify(void)
 	// {
 	// 	gyro_data = 0;
 	// }
+	static int16_t zaccel_data = 2;
+	zaccel_data += 2;
+	if (zaccel_data == 100)
+	{
+		zaccel_data = 0;
+	}
 
-	bt_gyrox_notify(gyro_xyz[0]);
+	bt_gyrox_notify(zaccel_data);
 }
 
 static void gyroy_notify(void)
@@ -200,8 +207,14 @@ static void gyroy_notify(void)
 	// {
 	// 	gyro_data = 0;
 	// }
+	static int16_t zaccel_data = 2;
+	zaccel_data += 2;
+	if (zaccel_data == 100)
+	{
+		zaccel_data = 0;
+	}
 
-	bt_gyroy_notify(gyro_xyz[1]);
+	bt_gyroy_notify(zaccel_data);
 }
 
 static void gyroz_notify(void)
@@ -212,8 +225,14 @@ static void gyroz_notify(void)
 	// static uint32_t gyro_data = 4;
 	// int16_t gyro_xyz[3] = {};
 	// lsm6dsm_read_gyro(gyro_xyz);
+	static int16_t zaccel_data = 2;
+	zaccel_data += 2;
+	if (zaccel_data == 100)
+	{
+		zaccel_data = 0;
+	}
 
-	bt_gyroz_notify(gyro_xyz[2]);
+	bt_gyroz_notify(zaccel_data);
 }
 
 void main(void)
@@ -237,7 +256,8 @@ void main(void)
 	max_enable_ecg();
 
 	err = bt_enable(NULL);
-	if (err) {
+	if (err)
+	{
 		printk("Bluetooth init failed (err %d)\n", err);
 		return;
 	}
@@ -249,15 +269,16 @@ void main(void)
 	/* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
 	 */
-	while (1) {
+	while (1)
+	{
 		xaccel_notify();
 		yaccel_notify();
 		zaccel_notify();
-		k_sleep(K_SECONDS(1));
+		// k_sleep(K_SECONDS(1));
 		ret = gpio_pin_toggle_dt(&led);
 
 		ret = lsm6dsm_read_status(&lsm6dsm_status);
-		if (lsm6dsm_status & (1<<0))
+		if (lsm6dsm_status & (1 << 0))
 		{
 			ret = lsm6dsm_read_accel(accel_xyz);
 			if (!ret)
@@ -265,9 +286,11 @@ void main(void)
 				xaccel_notify();
 				yaccel_notify();
 				zaccel_notify();
+				printf("Accel x: % 3.3f, y: % 3.3f, z: % 3.3f\n", ((float)accel_xyz[0]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[1]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[2]) * 0.061 / 1000 * 9.81);
 			}
 		}
-		if (lsm6dsm_status & (1<<1))
+
+		if (lsm6dsm_status & (1 << 1))
 		{
 			ret = lsm6dsm_read_gyro(gyro_xyz);
 			if (!ret)
@@ -275,14 +298,15 @@ void main(void)
 				gyrox_notify();
 				gyroy_notify();
 				gyroz_notify();
+				printf("Gyro x: % 3.3f, y: % 3.3f, z: % 3.3f\n", (gyro_xyz[0]) * 8.75 / 1000, (gyro_xyz[1]) * 8.75 / 1000, (gyro_xyz[2]) * 8.75 / 1000);
 			}
 		}
 		ret = max_read_ecg(&ecg_num);
 		if (!ret)
 		{
 			ecg_notify();
+			printk("%d\n", ecg_num);
 		}
-		
 	}
 }
 

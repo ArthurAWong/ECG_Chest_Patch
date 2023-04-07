@@ -39,20 +39,20 @@ const struct spi_buf_set rx = {
 	.count = ARRAY_SIZE(rx_bufs)
 };
 
-void lsm6dsm_test()
+bool lsm6dsm_read_who_am_i()
 {
-    to_display_format(buffer_tx, BUF_SIZE, buffer_print_tx);
-	printk("Sending:  %s\n", buffer_print_tx);
-	int ret = spi_transceive(spi_device, &accel_spi_cfg, &tx, &rx);
-	
-	if (ret) {
-		printk("Code %d\n", ret);
-		printk("SPI transceive failed\n");
-		return;
+    uint8_t who_am_i = 0;
+	lsm6dsm_read_buffer(LSM6DSM_WHO_AM_I, &who_am_i);
+	if (who_am_i == 0x6a)
+	{
+		printk("Accelerometer WHO_AM_I successful!\n");
+		return true;
+	} else 
+	{
+		printk("Accelerometer WHO_AM_I failed!\n");
+		return false;
 	}
 
-	to_display_format(buffer_rx, BUF_SIZE, buffer_print_rx);
-	printk("Recieved: %s\n",buffer_print_rx);
 }
 
 int lsm6dsm_write_buffer(uint8_t reg, uint8_t data)
@@ -136,9 +136,9 @@ int lsm6dsm_read_accel(int16_t *out_xyz)
 		1/1000 is the converstion from mili to base
 		9.81 is the converstion from gravity to m/s^2
 		*/
-		out_xyz[0] = ((float)raw_outx_xl); //*0.061/1000*9.81
-		out_xyz[1] = ((float)raw_outy_xl);
-		out_xyz[2] = ((float)raw_outz_xl);
+		out_xyz[0] = (raw_outx_xl); //*0.061/1000*9.81
+		out_xyz[1] = (raw_outy_xl);
+		out_xyz[2] = (raw_outz_xl);
 	}
 	else
 	{
@@ -180,9 +180,9 @@ int lsm6dsm_read_gyro(int16_t *out_xyz)
 		8.75 is the conversion factor between signed bits and degrees-per-second. It is defined in 
 		pg 23 of the datasheet. 1/1000 is the converstion from mili to base.
 		*/
-		out_xyz[0] = ((float)raw_outx_g); //*8.75/1000
-		out_xyz[1] = ((float)raw_outy_g);
-		out_xyz[2] = ((float)raw_outz_g);
+		out_xyz[0] = (raw_outx_g); //*8.75/1000
+		out_xyz[1] = (raw_outy_g);
+		out_xyz[2] = (raw_outz_g);
 	}
 	return ret;
 }

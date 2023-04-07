@@ -184,7 +184,7 @@
 
 /*********** FUNCTIONS ***********/
 
-void lsm6dsm_test();
+bool lsm6dsm_read_who_am_i();
 
 int lsm6dsm_enable_accel();
 int lsm6dsm_write_buffer(uint8_t reg, uint8_t data);

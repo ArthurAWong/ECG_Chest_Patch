@@ -246,10 +246,7 @@ void main(void)
 	}
 
 	max_reset_sw();
-	// max_readinfo();
 	// max_readstatus();
-
-	uint8_t lsm6dsm_status;
 
 	lsm6dsm_enable_accel();
 	lsm6dsm_enable_gyro();
@@ -266,16 +263,28 @@ void main(void)
 
 	bt_conn_auth_cb_register(&auth_cb_display);
 
+	uint8_t lsm6dsm_status;
+
 	/* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
 	 */
-	while (1)
-	{
-		xaccel_notify();
-		yaccel_notify();
-		zaccel_notify();
-		// k_sleep(K_SECONDS(1));
-		ret = gpio_pin_toggle_dt(&led);
+	while (1) {
+		// while(1) {
+		// 	if (lsm6dsm_read_who_am_i())
+		// 	{
+		// 	k_msleep(250);
+		// 	ret = gpio_pin_toggle_dt(&led);
+		// 	}
+		// 	max_readinfo();
+		// 	if ()
+		// 	{
+		// 		lsm6dsm_good = 1;
+		// 		yaccel_notify();
+		// 	} else {
+		// 		lsm6dsm_good = 0;
+		// 		yaccel_notify();
+		// 	}
+		// }
 
 		ret = lsm6dsm_read_status(&lsm6dsm_status);
 		if (lsm6dsm_status & (1 << 0))

@@ -18,17 +18,19 @@ counter = 0
 voltage_th = 500000
 x, y, z = [],[],[]
 xs, ys = [], []
-for index,port in enumerate(ports):
-    if "JLink" in port.description:
-        global ser
-        ser = serial.Serial(port.device,115200,xonxoff=True,rtscts=True) #115200 for bmd
-        ser.port = port.device
-        
-        print("Recognized JLink")
-        break
-    if index == len(ports) - 1:
-        print("JLink not found")
-
+try:
+    for index,port in enumerate(ports):
+        if "JLink" in port.description:
+            global ser
+            ser = serial.Serial(port.device,115200,xonxoff=True,rtscts=True) #115200 for bmd
+            ser.port = port.device
+            
+            print("Recognized JLink")
+            break
+        if index == len(ports) - 1:
+            print("JLink not found")
+except serial.SerialException:
+    print("COM port is currently in use!")
 
 
 def readPort():

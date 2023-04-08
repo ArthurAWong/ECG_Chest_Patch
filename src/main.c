@@ -137,9 +137,9 @@ static void xaccel_notify(void)
 	// TODO: replace with actual read accelerometer code
 	static int16_t xaccel_data = 0xfade;
 	xaccel_data += 1;
-	if (xaccel_data == 0xfffe)
+	if (xaccel_data == 100)
 	{
-		xaccel_data = 0xfade;
+		xaccel_data = 0;
 	}
 
 	bt_xaccel_notify(xaccel_data);
@@ -269,6 +269,13 @@ void main(void)
 	 * of starting delayed work so we do it here
 	 */
 	while (1) {
+		xaccel_notify();
+		yaccel_notify();
+		zaccel_notify();
+		gyrox_notify();
+		gyroy_notify();
+		gyroz_notify();
+		ecg_notify();
 		// while(1) {
 		// 	if (lsm6dsm_read_who_am_i())
 		// 	{
@@ -286,36 +293,36 @@ void main(void)
 		// 	}
 		// }
 
-		ret = lsm6dsm_read_status(&lsm6dsm_status);
-		if (lsm6dsm_status & (1 << 0))
-		{
-			ret = lsm6dsm_read_accel(accel_xyz);
-			if (!ret)
-			{
-				xaccel_notify();
-				yaccel_notify();
-				zaccel_notify();
-				printf("Accel x: % 3.3f, y: % 3.3f, z: % 3.3f\n", ((float)accel_xyz[0]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[1]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[2]) * 0.061 / 1000 * 9.81);
-			}
-		}
+	// 	ret = lsm6dsm_read_status(&lsm6dsm_status);
+	// 	if (lsm6dsm_status & (1 << 0))
+	// 	{
+	// 		ret = lsm6dsm_read_accel(accel_xyz);
+	// 		if (!ret)
+	// 		{
+	// 			xaccel_notify();
+	// 			yaccel_notify();
+	// 			zaccel_notify();
+	// 			printf("Accel x: % 3.3f, y: % 3.3f, z: % 3.3f\n", ((float)accel_xyz[0]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[1]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[2]) * 0.061 / 1000 * 9.81);
+	// 		}
+	// 	}
 
-		if (lsm6dsm_status & (1 << 1))
-		{
-			ret = lsm6dsm_read_gyro(gyro_xyz);
-			if (!ret)
-			{
-				gyrox_notify();
-				gyroy_notify();
-				gyroz_notify();
-				printf("Gyro x: % 3.3f, y: % 3.3f, z: % 3.3f\n", (gyro_xyz[0]) * 8.75 / 1000, (gyro_xyz[1]) * 8.75 / 1000, (gyro_xyz[2]) * 8.75 / 1000);
-			}
-		}
-		ret = max_read_ecg(&ecg_num);
-		if (!ret)
-		{
-			ecg_notify();
-			printk("%d\n", ecg_num);
-		}
+	// 	if (lsm6dsm_status & (1 << 1))
+	// 	{
+	// 		ret = lsm6dsm_read_gyro(gyro_xyz);
+	// 		if (!ret)
+	// 		{
+	// 			gyrox_notify();
+	// 			gyroy_notify();
+	// 			gyroz_notify();
+	// 			printf("Gyro x: % 3.3f, y: % 3.3f, z: % 3.3f\n", (gyro_xyz[0]) * 8.75 / 1000, (gyro_xyz[1]) * 8.75 / 1000, (gyro_xyz[2]) * 8.75 / 1000);
+	// 		}
+	// 	}
+	// 	ret = max_read_ecg(&ecg_num);
+	// 	if (!ret)
+	// 	{
+	// 		ecg_notify();
+	// 		printk("%d\n", ecg_num);
+	// 	}
 	}
 }
 

@@ -36,10 +36,6 @@ async def callback(sender: BleakGATTCharacteristic, data: bytearray):
         ecg_val = data
         # print("ecg_val set")
     
-
-    
-
-
 async def get_notifications(address):
     async with BleakClient(address) as client:
         global flag
@@ -72,16 +68,11 @@ async def get_notifications(address):
 
         # print("Model Number: {0}".format("".join(map(chr, characteristic))))
 
-
-
-
 def returnvals():
     return x_xl_val, y_xl_val, z_xl_val, x_gyro_val, y_gyro_val, z_gyro_val, ecg_val
 
-
 async def main():
     await get_notifications(address)
-
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()

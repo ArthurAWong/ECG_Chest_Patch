@@ -4,7 +4,7 @@ import traceback
 from contextlib import suppress
 from concurrent.futures import ThreadPoolExecutor
 
-BLE_NAME = "Clyde and Vince's Child"
+BLE_NAME = "Arthur"
 
 accelx_data_uuid = "3b8cdf21-24a2-468c-9236-20f50b770bf5"
 accely_data_uuid = "1094b4ef-76bd-4341-aa96-83f99198db63"
@@ -51,7 +51,10 @@ async def ecgCallback(sender: BleakGATTCharacteristic, data: bytearray):
     ecg_queuePut(int.from_bytes(data, "little"))
 
 async def main():
-    BLEDevice = await BleakScanner().find_device_by_name(BLE_NAME)
+    BLEDevice = None
+    while(BLEDevice == None):
+        BLEDevice = await BleakScanner().find_device_by_name(BLE_NAME)
+    print(BLEDevice.address)
     try:
         async with BleakClient(BLEDevice) as client:
             print(f"Connected: {client.is_connected}")

@@ -101,6 +101,12 @@ int lsm6dsm_read_status(uint8_t *status_data)
 	return ret;
 }
 
+int lsm6dsm_reset_sw(void)
+{
+	int ret = lsm6dsm_write_buffer(LSM6DSM_CTRL3_C, 0x01);
+	return ret;
+}
+
 int lsm6dsm_read_accel(int16_t *out_xyz)
 {
 	uint8_t out_var = 0;

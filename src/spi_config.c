@@ -32,7 +32,7 @@ struct spi_cs_control accel_spi_cs =
 
 struct spi_config max_spi_cfg = 
 {
-	.frequency = 250000,
+	.frequency = 125000,
 	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_CONFIG_ORDER_MsbFirst |
                 SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
 	.slave = 0,
@@ -42,7 +42,7 @@ struct spi_config max_spi_cfg =
 
 struct spi_config accel_spi_cfg = 
 {
-	.frequency = 250000,
+	.frequency = 125000,
 	.operation = SPI_OP_MODE_MASTER | SPI_MODE_CPOL | SPI_CONFIG_ORDER_MsbFirst |
                 SPI_MODE_CPHA | SPI_WORD_SET(8) | SPI_LINES_SINGLE,
 	.slave = 0,

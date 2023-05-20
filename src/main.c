@@ -43,9 +43,9 @@
 
 #include <zephyr/drivers/gpio.h>
 
-int16_t accel_xyz[3] = {};
-int16_t gyro_xyz[3] = {};
-int32_t ecg_num;
+#define ECG_CHARACTERISTIC_STUFFING 30
+#define ACCEL_CHARACTERISTIC_STUFFING 15 /*ENSURE IS MULTIPLE OF 3*/
+#define GYRO_CHARACTERISTIC_STUFFING 15 /*ENSURE IS MULTIPLE OF 3*/
 
 struct gpio_dt_spec led = 
 	{
@@ -67,6 +67,7 @@ static void connected(struct bt_conn *conn, uint8_t err)
 	} else {
 		printk("Connected\n");
 		gpio_pin_set_dt(&led, 1);
+		bt_conn_le_phy_update(conn, BT_CONN_LE_PHY_PARAM_2M);
 	}
 }
 
@@ -109,7 +110,7 @@ static struct bt_conn_auth_cb auth_cb_display = {
 	.cancel = auth_cancel,
 };
 
-static void ecg_notify(void)
+static void ecg_notify(int32_t *ptr, uint8_t len)
 {
 	// Actual way to do it, for now commented out
 	// TODO: uncomment the following code
@@ -119,63 +120,63 @@ static void ecg_notify(void)
 	// uint16_t eight_bit_ECG_data = (uint16_t) ecg_data;
 
 	// Following code is just a test for Vince's debugging
-	static int16_t eight_bit_ECG_data = 4;
-	eight_bit_ECG_data += 1;
-	if (eight_bit_ECG_data == 100)
-	{
-		eight_bit_ECG_data = 0;
-	}
+	// static int16_t eight_bit_ECG_data = 4;
+	// eight_bit_ECG_data += 1;
+	// if (eight_bit_ECG_data == 100)
+	// {
+	// 	eight_bit_ECG_data = 0;
+	// }
 
-	bt_ecg_notify(ecg_num);
+	bt_ecg_notify(ptr, len);
 	//bt_ecg_notify(eight_bit_ECG_data);
 }
 
-static void xaccel_notify(void)
+static void accel_notify(int16_t *ptr, uint8_t len)
 {
 
 	// Following code is just a test for Vince's debugging
 	// TODO: replace with actual read accelerometer code
-	static int16_t xaccel_data = 0xfade;
-	xaccel_data += 1;
-	if (xaccel_data == 100)
-	{
-		xaccel_data = 0;
-	}
+	// static int16_t xaccel_data = 0xfade;
+	// xaccel_data += 1;
+	// if (xaccel_data == 100)
+	// {
+	// 	xaccel_data = 0;
+	// }
 
-	bt_xaccel_notify(accel_xyz[0]);
+	bt_accel_notify(ptr, len);
 }
 
-static void yaccel_notify(void)
-{
+// static void yaccel_notify(void)
+// {
 
-	// Following code is just a test for Vince's debugging
-	// TODO: replace with actual read accelerometer code
-	static int16_t yaccel_data = 1;
-	yaccel_data += 1;
-	if(yaccel_data == 100)
-	{
-		yaccel_data = 0;
-	}
+// 	// Following code is just a test for Vince's debugging
+// 	// TODO: replace with actual read accelerometer code
+// 	static int16_t yaccel_data = 1;
+// 	yaccel_data += 1;
+// 	if(yaccel_data == 100)
+// 	{
+// 		yaccel_data = 0;
+// 	}
 
-	bt_yaccel_notify(accel_xyz[1]);
-}
+// 	bt_yaccel_notify(accel_xyz[1]);
+// }
 
-static void zaccel_notify(void)
-{
+// static void zaccel_notify(void)
+// {
 
-	// Following code is just a test for Vince's debugging
-	// TODO: replace with actual read accelerometer code
-	static int16_t zaccel_data = 2;
-	zaccel_data += 2;
-	if(zaccel_data == 100)
-	{
-		zaccel_data = 0;
-	}
+// 	// Following code is just a test for Vince's debugging
+// 	// TODO: replace with actual read accelerometer code
+// 	static int16_t zaccel_data = 2;
+// 	zaccel_data += 2;
+// 	if(zaccel_data == 100)
+// 	{
+// 		zaccel_data = 0;
+// 	}
 
-	bt_zaccel_notify(accel_xyz[2]);
-}
+// 	bt_zaccel_notify(accel_xyz[2]);
+// }
 
-static void gyrox_notify(void)
+static void gyro_notify(int16_t *ptr, uint8_t len)
 {
 
 	// // Following code is just a test for Vince's debugging
@@ -186,54 +187,54 @@ static void gyrox_notify(void)
 	// {
 	// 	gyro_data = 0;
 	// }
-	static int16_t zaccel_data = 2;
-	zaccel_data += 2;
-	if (zaccel_data == 100)
-	{
-		zaccel_data = 0;
-	}
-
-	bt_gyrox_notify(gyro_xyz[0]);
-}
-
-static void gyroy_notify(void)
-{
-
-	// // Following code is just a test for Vince's debugging
-	// // TODO: replace with actual read accelerometer code
-	// static uint32_t gyro_data = 3;
-	// gyro_data += 1;
-	// if(gyro_data == 100)
+	// static int16_t zaccel_data = 2;
+	// zaccel_data += 2;
+	// if (zaccel_data == 100)
 	// {
-	// 	gyro_data = 0;
+	// 	zaccel_data = 0;
 	// }
-	static int16_t zaccel_data = 2;
-	zaccel_data += 2;
-	if (zaccel_data == 100)
-	{
-		zaccel_data = 0;
-	}
 
-	bt_gyroy_notify(gyro_xyz[1]);
+	bt_gyro_notify(ptr, len);
 }
 
-static void gyroz_notify(void)
-{
+// static void gyroy_notify(void)
+// {
 
-	// // Following code is just a test for Vince's debugging
-	// // TODO: replace with actual read accelerometer code
-	// static uint32_t gyro_data = 4;
-	// int16_t gyro_xyz[3] = {};
-	// lsm6dsm_read_gyro(gyro_xyz);
-	static int16_t zaccel_data = 2;
-	zaccel_data += 2;
-	if (zaccel_data == 100)
-	{
-		zaccel_data = 0;
-	}
+// 	// // Following code is just a test for Vince's debugging
+// 	// // TODO: replace with actual read accelerometer code
+// 	// static uint32_t gyro_data = 3;
+// 	// gyro_data += 1;
+// 	// if(gyro_data == 100)
+// 	// {
+// 	// 	gyro_data = 0;
+// 	// }
+// 	static int16_t zaccel_data = 2;
+// 	zaccel_data += 2;
+// 	if (zaccel_data == 100)
+// 	{
+// 		zaccel_data = 0;
+// 	}
 
-	bt_gyroz_notify(gyro_xyz[2]);
-}
+// 	bt_gyroy_notify(gyro_xyz[1]);
+// }
+
+// static void gyroz_notify(void)
+// {
+
+// 	// // Following code is just a test for Vince's debugging
+// 	// // TODO: replace with actual read accelerometer code
+// 	// static uint32_t gyro_data = 4;
+// 	// int16_t gyro_xyz[3] = {};
+// 	// lsm6dsm_read_gyro(gyro_xyz);
+// 	static int16_t zaccel_data = 2;
+// 	zaccel_data += 2;
+// 	if (zaccel_data == 100)
+// 	{
+// 		zaccel_data = 0;
+// 	}
+
+// 	bt_gyroz_notify(gyro_xyz[2]);
+// }
 
 void main(void)
 {
@@ -245,6 +246,7 @@ void main(void)
 		return;
 	}
 
+	lsm6dsm_reset_sw();
 	max_reset_sw();
 	// max_readstatus();
 
@@ -264,6 +266,18 @@ void main(void)
 	bt_conn_auth_cb_register(&auth_cb_display);
 
 	uint8_t lsm6dsm_status;
+
+	int i = 0;
+	int j = 0;
+	int k = 0;
+
+	int16_t accel_xyz[3] = {};
+	int16_t gyro_xyz[3] = {};
+	int32_t ecg_num;
+
+	int32_t ecg_arr[ECG_CHARACTERISTIC_STUFFING];
+	int16_t accel_arr[ACCEL_CHARACTERISTIC_STUFFING];
+	int16_t gyro_arr[GYRO_CHARACTERISTIC_STUFFING];
 
 	/* Implement notification. At the moment there is no suitable way
 	 * of starting delayed work so we do it here
@@ -299,10 +313,18 @@ void main(void)
 			ret = lsm6dsm_read_accel(accel_xyz);
 			if (!ret)
 			{
-				xaccel_notify();
-				yaccel_notify();
-				zaccel_notify();
-				printf("Accel x: % 3.3f, y: % 3.3f, z: % 3.3f\n", ((float)accel_xyz[0]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[1]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[2]) * 0.061 / 1000 * 9.81);
+				accel_arr[i] = accel_xyz[0];
+				i += 1;
+				accel_arr[i+1] = accel_xyz[1];
+				i += 1;
+				accel_arr[i+2] = accel_xyz[2];
+				i += 1;
+				if (i >= ACCEL_CHARACTERISTIC_STUFFING)
+				{
+					accel_notify(accel_arr, ACCEL_CHARACTERISTIC_STUFFING);
+					i = 0;
+				}
+				// printf("Accel x: % 3.3f, y: % 3.3f, z: % 3.3f\n", ((float)accel_xyz[0]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[1]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[2]) * 0.061 / 1000 * 9.81);
 			}
 		}
 
@@ -311,17 +333,34 @@ void main(void)
 			ret = lsm6dsm_read_gyro(gyro_xyz);
 			if (!ret)
 			{
-				gyrox_notify();
-				gyroy_notify();
-				gyroz_notify();
-				printf("Gyro x: % 3.3f, y: % 3.3f, z: % 3.3f\n", (gyro_xyz[0]) * 8.75 / 1000, (gyro_xyz[1]) * 8.75 / 1000, (gyro_xyz[2]) * 8.75 / 1000);
+				gyro_arr[j] = gyro_xyz[0];
+				j += 1;
+				gyro_arr[j] = gyro_xyz[1];
+				j += 1;
+				gyro_arr[j] = gyro_xyz[2];
+				j += 1;
+				if (j >= GYRO_CHARACTERISTIC_STUFFING)
+				{
+					gyro_notify(gyro_arr, GYRO_CHARACTERISTIC_STUFFING);
+					j=0;
+				}
+				// gyrox_notify();
+				// gyroy_notify();
+				// gyroz_notify();
+				// printf("Gyro x: % 3.3f, y: % 3.3f, z: % 3.3f\n", (gyro_xyz[0]) * 8.75 / 1000, (gyro_xyz[1]) * 8.75 / 1000, (gyro_xyz[2]) * 8.75 / 1000);
 			}
 		}
 		ret = max_read_ecg(&ecg_num);
 		if (!ret)
 		{
-			ecg_notify();
-			printk("%d\n", ecg_num);
+			ecg_arr[k] = ecg_num;
+			k++;
+			// printk("%d\n", ecg_num);
+			if (k >= ECG_CHARACTERISTIC_STUFFING)
+			{
+				ecg_notify(ecg_arr, ECG_CHARACTERISTIC_STUFFING);
+				k = 0;
+			}
 		}
 	}
 }

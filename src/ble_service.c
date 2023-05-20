@@ -209,88 +209,79 @@ static int chestpatch_val_init(const struct device *dev)
 	return 0;
 }
 
-int bt_ecg_notify(int32_t val)
+int bt_ecg_notify(int32_t *val, uint8_t len)
 {
 	int rc;
-	static int32_t ecg;
 
-	ecg = val;
-
-	rc = bt_gatt_notify(NULL, &ecg_svc.attrs[2], &ecg, sizeof(ecg));
+	rc = bt_gatt_notify(NULL, &ecg_svc.attrs[2], val, len*sizeof(*val));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_xaccel_notify(int16_t val)
+int bt_accel_notify(int16_t *ptr, uint8_t len)
 {
 	int rc;
-	static int16_t xaccel;
 
-	xaccel = val;
-
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[2], &xaccel, sizeof(xaccel));
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[2], ptr, len*sizeof(*ptr));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_yaccel_notify(int16_t val)
+// int bt_yaccel_notify(int16_t val)
+// {
+// 	int rc;
+// 	static int16_t yaccel;
+
+// 	yaccel = val;
+
+// 	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[5], &yaccel, sizeof(yaccel));
+
+// 	return rc == -ENOTCONN ? 0 : rc;
+// }
+
+// int bt_zaccel_notify(int16_t val)
+// {
+// 	int rc;
+// 	static int16_t zaccel;
+
+// 	zaccel = val;
+
+// 	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[8], &zaccel, sizeof(zaccel));
+
+// 	return rc == -ENOTCONN ? 0 : rc;
+// }
+
+int bt_gyro_notify(int16_t *ptr, uint8_t len)
 {
 	int rc;
-	static int16_t yaccel;
-
-	yaccel = val;
-
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[5], &yaccel, sizeof(yaccel));
+	
+	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[11], ptr, len*sizeof(*ptr));
 
 	return rc == -ENOTCONN ? 0 : rc;
 }
 
-int bt_zaccel_notify(int16_t val)
-{
-	int rc;
-	static int16_t zaccel;
+// int bt_gyroy_notify(int16_t val)
+// {
+// 	int rc;
+// 	static int16_t gyroy;
 
-	zaccel = val;
+// 	gyroy = val;
 
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[8], &zaccel, sizeof(zaccel));
+// 	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[14], &gyroy, sizeof(gyroy));
 
-	return rc == -ENOTCONN ? 0 : rc;
-}
+// 	return rc == -ENOTCONN ? 0 : rc;
+// }
 
-int bt_gyrox_notify(int16_t val)
-{
-	int rc;
-	static int16_t gyro;
+// int bt_gyroz_notify(int16_t val)
+// {
+// 	int rc;
+// 	static int16_t gyroz;
 
-	gyro = val;
+// 	gyroz = val;
 
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[11], &gyro, sizeof(gyro));
+// 	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[17], &gyroz, sizeof(gyroz));
 
-	return rc == -ENOTCONN ? 0 : rc;
-}
-
-int bt_gyroy_notify(int16_t val)
-{
-	int rc;
-	static int16_t gyroy;
-
-	gyroy = val;
-
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[14], &gyroy, sizeof(gyroy));
-
-	return rc == -ENOTCONN ? 0 : rc;
-}
-
-int bt_gyroz_notify(int16_t val)
-{
-	int rc;
-	static int16_t gyroz;
-
-	gyroz = val;
-
-	rc = bt_gatt_notify(NULL, &accelerometer_svc.attrs[17], &gyroz, sizeof(gyroz));
-
-	return rc == -ENOTCONN ? 0 : rc;
-}
+// 	return rc == -ENOTCONN ? 0 : rc;
+// }
 
 SYS_INIT(chestpatch_val_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);

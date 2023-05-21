@@ -23,6 +23,7 @@ struct spi_buf tx_bufs[1] = {
 		.len = BUF_SIZE
 	}
 };
+
 struct spi_buf rx_bufs[1] = 
 {
 	{
@@ -39,6 +40,7 @@ const struct spi_buf_set rx = {
 	.count = ARRAY_SIZE(rx_bufs)
 };
 
+// Verifies successful wiring/SPI configuration.
 bool lsm6dsm_read_who_am_i()
 {
     uint8_t who_am_i = 0;

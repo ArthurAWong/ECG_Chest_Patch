@@ -34,6 +34,8 @@
 	};
 };
 
+
+// It is CRITICAL to specify which pin belongs to cs-gpios here. Without it, the CS pins will not activate properly
 &spi1 {
 	status = "okay";
 	pinctrl-0 = <&spi1_default>;
@@ -41,7 +43,6 @@
 	pinctrl-names = "default", "sleep";
 	cs-gpios = <&gpio0 11 GPIO_ACTIVE_LOW>,
 				<&gpio0 12 GPIO_ACTIVE_LOW>;
-
 };
 
 &uart0 {

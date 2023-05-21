@@ -12,6 +12,7 @@
 uint8_t max_buffer_tx[MAX_BUF_SIZE] = {};
 uint8_t max_buffer_rx[MAX_BUF_SIZE] = {};
 
+// Debug print buffers for printing out hex values to terminal.
 uint8_t max_buffer_print_tx[MAX_BUF_SIZE * 5 + 1];
 uint8_t max_buffer_print_rx[MAX_BUF_SIZE * 5 + 1];
 
@@ -160,6 +161,8 @@ int max_readstatus()
 	return ret;
 }
 
+// The pin configurations were taken from Maxim Integrated's demo code repository. See the link below and scroll down to the bottom of main.c
+// https://os.mbed.com/teams/MH/code/MAX30003WING_monitorhealth_beta_test1_Ch//file/8fc65c8fa0e8/main.cpp/
 int max_enable_ecg()
 {
 	int ret;
@@ -175,6 +178,7 @@ int max_enable_ecg()
 								| (0b0011 << CNFG_RTOR1_PTSF) | (1 << CNFG_RTOR1_EN_RTOR);
     ret = max30003_write_uint32(CNFG_RTOR1, cnfg_rtor_reg);
 
+	// Registry involved with setting up interrupts
     // uint32_t mngr_int_reg = (0b00011 << MNGR_INT_EFIT) | (0b01 << MNGR_INT_CLR_RRINT);
 	// ret = max30003_write_uint32(MNGR_INT, mngr_int_reg);
 
@@ -187,28 +191,6 @@ int max_enable_ecg()
 	uint32_t cnfg_emux_reg = 0x00000000 & ~(1 << CNFG_EMUX_OPENN) & ~(1 << CNFG_EMUX_OPENP);
 	ret = max30003_write_uint32(CNFG_EMUX, cnfg_emux_reg);
 
-	// ret = max30003_read(CNFG_GEN, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-	// ret = max30003_read(CNFG_ECG, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-	// ret = max30003_read(CNFG_RTOR1, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-	// ret = max30003_read(MNGR_INT, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-	// ret = max30003_read(EN_INT, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-	// ret = max30003_read(MNGR_DYN, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-	// ret = max30003_read(CNFG_EMUX, data, sizeof(data));
-	// to_display_format(data, 3, max_buffer_print_rx);
-	// printk("%s\n", max_buffer_print_rx);
-
 	ret = max30003_write_uint32(SYNCH, 0x00000000);
 	ret = max30003_write_uint32(FIFO_RST, 0x00000000);
 
@@ -220,6 +202,7 @@ int max_read_ecg(int32_t *out_val)
 	int ret;
 	uint8_t data[3] = {0x00, 0x00, 0x00};
 	ret = max30003_read(STATUS, data, sizeof(data));
+	// Checks to see if FIFO register has overflowed. If so, reset FIFO register.
 	if (data[0] & (1 << 6))
 	{
 		printk("OVERFLOW!\n");
@@ -227,17 +210,19 @@ int max_read_ecg(int32_t *out_val)
 		return 1;
 	}
 
+	// Checks to see if FIFO register is ready to be read.
 	if (data[0] & (1 << 7))
 	{
 		ret = max30003_read(ECG_FIFO, data, sizeof(data));
-		//to_display_format(data, 3, max_buffer_print_rx);
-		//printk("%s\n", max_buffer_print_rx);
 		uint32_t ecg_data = ((data[0] << 16) | (data[1] << 8) | (data[2] << 0)) >> 6;
 		uint8_t data_tags = ((data[2] & (0x3F)) >> 3);
+
+		// Checks to see if the data read is good.
 		if (data_tags != 0)
 		{
 			return 1;
 		}
+		// Returned data is in two's complement, converting it to signed int32.
 		if (ecg_data > 131072)
 		{
 			*out_val = ecg_data - 262144;

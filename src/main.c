@@ -1,20 +1,3 @@
-
-// /*
-//  * Copyright (c) 2012-2014 Wind River Systems, Inc.
-//  *
-//  * SPDX-License-Identifier: Apache-2.0
-//  */
-// #include "max30003.h"
-
-// void main(void)
-// {	
-// 	//setup_interrupt();
-	// max_reset_sw();
-	// max_readinfo();
-	// max_readstatus();
-	// max_enable_ecg();
-// }
-
 /* main.c - Application main entry point */
 
 /*
@@ -44,9 +27,10 @@
 #include <zephyr/drivers/gpio.h>
 
 #define ECG_CHARACTERISTIC_STUFFING 30
-#define ACCEL_CHARACTERISTIC_STUFFING 15 /*ENSURE IS MULTIPLE OF 3*/
-#define GYRO_CHARACTERISTIC_STUFFING 15 /*ENSURE IS MULTIPLE OF 3*/
+#define ACCEL_CHARACTERISTIC_STUFFING 15 /*ENSURE IS MULTIPLE OF 3 (one for x, one for y, one for z)*/
+#define GYRO_CHARACTERISTIC_STUFFING 15 /*ENSURE IS MULTIPLE OF 3 (one for x, one for y, one for z)*/
 
+// Structure below is for setting up the Bluetooth connected LED
 struct gpio_dt_spec led = 
 	{
 		.port = DEVICE_DT_GET(DT_NODELABEL(gpio0)),
@@ -60,6 +44,7 @@ static const struct bt_data ad[] = {
 		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
 };
 
+// Current implementation of turning on the Bluetooth LED is weird. The board will start off with this LED on after being programmed.
 static void connected(struct bt_conn *conn, uint8_t err)
 {
 	if (err) {
@@ -110,131 +95,23 @@ static struct bt_conn_auth_cb auth_cb_display = {
 	.cancel = auth_cancel,
 };
 
+// This function is just a wrapper for bt_ecg_notify.
 static void ecg_notify(int32_t *ptr, uint8_t len)
 {
-	// Actual way to do it, for now commented out
-	// TODO: uncomment the following code
-	// static uint8_t ecg_val[3] = {0x00, 0x00, 0x00};
-	// int err = max30003_read(ECG_FIFO, &ecg_val, sizeof(ecg_val));
-	// uint32_t ecg_data = ((ecg_val[0] << 16) | (ecg_val[1] << 8) | (ecg_val[2] << 0)) >> 6;
-	// uint16_t eight_bit_ECG_data = (uint16_t) ecg_data;
-
-	// Following code is just a test for Vince's debugging
-	// static int16_t eight_bit_ECG_data = 4;
-	// eight_bit_ECG_data += 1;
-	// if (eight_bit_ECG_data == 100)
-	// {
-	// 	eight_bit_ECG_data = 0;
-	// }
-
 	bt_ecg_notify(ptr, len);
-	//bt_ecg_notify(eight_bit_ECG_data);
 }
 
+// This function is just a wrapper for bt_accel_notify.
 static void accel_notify(int16_t *ptr, uint8_t len)
 {
-
-	// Following code is just a test for Vince's debugging
-	// TODO: replace with actual read accelerometer code
-	// static int16_t xaccel_data = 0xfade;
-	// xaccel_data += 1;
-	// if (xaccel_data == 100)
-	// {
-	// 	xaccel_data = 0;
-	// }
-
 	bt_accel_notify(ptr, len);
 }
 
-// static void yaccel_notify(void)
-// {
-
-// 	// Following code is just a test for Vince's debugging
-// 	// TODO: replace with actual read accelerometer code
-// 	static int16_t yaccel_data = 1;
-// 	yaccel_data += 1;
-// 	if(yaccel_data == 100)
-// 	{
-// 		yaccel_data = 0;
-// 	}
-
-// 	bt_yaccel_notify(accel_xyz[1]);
-// }
-
-// static void zaccel_notify(void)
-// {
-
-// 	// Following code is just a test for Vince's debugging
-// 	// TODO: replace with actual read accelerometer code
-// 	static int16_t zaccel_data = 2;
-// 	zaccel_data += 2;
-// 	if(zaccel_data == 100)
-// 	{
-// 		zaccel_data = 0;
-// 	}
-
-// 	bt_zaccel_notify(accel_xyz[2]);
-// }
-
+// This function is just a wrapper for bt_gyro_notify.
 static void gyro_notify(int16_t *ptr, uint8_t len)
 {
-
-	// // Following code is just a test for Vince's debugging
-	// // TODO: replace with actual read accelerometer code
-	// static uint32_t gyro_data = 2;
-	// gyro_data += 1;
-	// if(gyro_data == 100)
-	// {
-	// 	gyro_data = 0;
-	// }
-	// static int16_t zaccel_data = 2;
-	// zaccel_data += 2;
-	// if (zaccel_data == 100)
-	// {
-	// 	zaccel_data = 0;
-	// }
-
 	bt_gyro_notify(ptr, len);
 }
-
-// static void gyroy_notify(void)
-// {
-
-// 	// // Following code is just a test for Vince's debugging
-// 	// // TODO: replace with actual read accelerometer code
-// 	// static uint32_t gyro_data = 3;
-// 	// gyro_data += 1;
-// 	// if(gyro_data == 100)
-// 	// {
-// 	// 	gyro_data = 0;
-// 	// }
-// 	static int16_t zaccel_data = 2;
-// 	zaccel_data += 2;
-// 	if (zaccel_data == 100)
-// 	{
-// 		zaccel_data = 0;
-// 	}
-
-// 	bt_gyroy_notify(gyro_xyz[1]);
-// }
-
-// static void gyroz_notify(void)
-// {
-
-// 	// // Following code is just a test for Vince's debugging
-// 	// // TODO: replace with actual read accelerometer code
-// 	// static uint32_t gyro_data = 4;
-// 	// int16_t gyro_xyz[3] = {};
-// 	// lsm6dsm_read_gyro(gyro_xyz);
-// 	static int16_t zaccel_data = 2;
-// 	zaccel_data += 2;
-// 	if (zaccel_data == 100)
-// 	{
-// 		zaccel_data = 0;
-// 	}
-
-// 	bt_gyroz_notify(gyro_xyz[2]);
-// }
 
 void main(void)
 {
@@ -246,9 +123,9 @@ void main(void)
 		return;
 	}
 
+	// Clears out any possible erroneous programming that may have occured on the peripherals
 	lsm6dsm_reset_sw();
 	max_reset_sw();
-	// max_readstatus();
 
 	lsm6dsm_enable_accel();
 	lsm6dsm_enable_gyro();
@@ -275,39 +152,15 @@ void main(void)
 	int16_t gyro_xyz[3] = {};
 	int32_t ecg_num;
 
+	// Characteristic stuffing is when we load our data into an array and burst send it on Bluetooth. 
+	// This is important as this reduces the number of times BLE has to notify and reduces the overhead associated with it.
 	int32_t ecg_arr[ECG_CHARACTERISTIC_STUFFING];
 	int16_t accel_arr[ACCEL_CHARACTERISTIC_STUFFING];
 	int16_t gyro_arr[GYRO_CHARACTERISTIC_STUFFING];
 
-	/* Implement notification. At the moment there is no suitable way
-	 * of starting delayed work so we do it here
-	 */
 	while (1) {
-		// xaccel_notify();
-		// yaccel_notify();
-		// zaccel_notify();
-		// gyrox_notify();
-		// gyroy_notify();
-		// gyroz_notify();
-		// ecg_notify();
-		// while(1) {
-		// 	if (lsm6dsm_read_who_am_i())
-		// 	{
-		// 	k_msleep(250);
-		// 	ret = gpio_pin_toggle_dt(&led);
-		// 	}
-		// 	max_readinfo();
-		// 	if ()
-		// 	{
-		// 		lsm6dsm_good = 1;
-		// 		yaccel_notify();
-		// 	} else {
-		// 		lsm6dsm_good = 0;
-		// 		yaccel_notify();
-		// 	}
-		// }
-
 		ret = lsm6dsm_read_status(&lsm6dsm_status);
+		// Checks to see if the LSM6DSM is ready to send out accelerometer data
 		if (lsm6dsm_status & (1 << 0))
 		{
 			ret = lsm6dsm_read_accel(accel_xyz);
@@ -327,7 +180,7 @@ void main(void)
 				// printf("Accel x: % 3.3f, y: % 3.3f, z: % 3.3f\n", ((float)accel_xyz[0]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[1]) * 0.061 / 1000 * 9.81, ((float)accel_xyz[2]) * 0.061 / 1000 * 9.81);
 			}
 		}
-
+		// Checks to see if the LSM6DSM is ready to send out gyroscope data
 		if (lsm6dsm_status & (1 << 1))
 		{
 			ret = lsm6dsm_read_gyro(gyro_xyz);
@@ -344,9 +197,6 @@ void main(void)
 					gyro_notify(gyro_arr, GYRO_CHARACTERISTIC_STUFFING);
 					j=0;
 				}
-				// gyrox_notify();
-				// gyroy_notify();
-				// gyroz_notify();
 				// printf("Gyro x: % 3.3f, y: % 3.3f, z: % 3.3f\n", (gyro_xyz[0]) * 8.75 / 1000, (gyro_xyz[1]) * 8.75 / 1000, (gyro_xyz[2]) * 8.75 / 1000);
 			}
 		}

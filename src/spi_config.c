@@ -8,6 +8,9 @@
 
 #include "spi_config.h"
 
+
+// Setting up which pins is responsible for MOSI, MISO, CLK, and SCK is done in the device tree or overlay file (nrf52dk_nrf52832.overlay).
+
 struct spi_cs_control max_spi_cs =
 {
 	.gpio = 
